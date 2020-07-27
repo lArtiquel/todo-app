@@ -1,8 +1,8 @@
 package com.todo.config;
 
-import com.todo.security.JwtAuthEntryPoint;
+import com.todo.security.JwtAuthFailureHandler;
 import com.todo.security.JwtAuthFilter;
-import com.todo.services.UserDetailsServiceImpl;
+import com.todo.service.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,53 +28,56 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
         prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    /** Service to fetch UserDetails*/
-    @Autowired
-    UserDetailsServiceImpl userDetailsService;
+    /** Service used to fetch UserDetails */
+    private UserDetailsServiceImpl userDetailsService;
+    /** Used to commence http request properly */
+    private JwtAuthFailureHandler unauthorizedHandler;
+    /** Jwt authentication filter */
+    private JwtAuthFilter jwtAuthFilter;
 
-    /**  */
     @Autowired
-    private JwtAuthEntryPoint unauthorizedHandler;
-
-    /** */
-    @Bean
-    public JwtAuthFilter authenticationJwtTokenFilter() {
-        return new JwtAuthFilter();
+    public WebSecurityConfig(UserDetailsServiceImpl userDetailsService, JwtAuthFailureHandler unauthorizedHandler, JwtAuthFilter jwtAuthFilter) {
+        this.userDetailsService = userDetailsService;
+        this.unauthorizedHandler = unauthorizedHandler;
+        this.jwtAuthFilter = jwtAuthFilter;
     }
 
+    /** BCrypt password encoder */
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    /**
+     * Configure authentication manager.
+     * Make it use our user details service with BCrypt password encoder.
+     */
     @Override
     public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
         authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
     }
 
+    /** Create authentication manager bean. */
     @Bean
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.cors().and().csrf().disable()
-                	.exceptionHandling().authenticationEntryPoint(unauthorizedHandler)
-				.and()
-                	.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-				.and()
-                	.authorizeRequests()
-                    .antMatchers("/api/auth/**", "/api/board/all").permitAll()
-                	.anyRequest().authenticated()
-                .and()
-                	.logout()
-                	.invalidateHttpSession(true)
-                	.clearAuthentication(true)
-                	.permitAll();
-        // Add JWT filter before Security to validate the tokens
-        http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+        http
+                .cors().and().csrf().disable()
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler)
+            .and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and()
+                .authorizeRequests()
+                .antMatchers("/api/auth/**", "/api/board/**").permitAll()
+            .and()
+                .authorizeRequests()
+                .anyRequest().authenticated();
     }
 
 }

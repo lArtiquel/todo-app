@@ -13,12 +13,12 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
 /**
- * Modifies the headers on the ServletResponse as necessary to commence the authentication process.
+ * Used to handle authentication failure properly.
  */
 @Component
-public class JwtAuthEntryPoint implements AuthenticationEntryPoint {
+public class JwtAuthFailureHandler implements AuthenticationEntryPoint {
 
-	private static final Logger logger = LoggerFactory.getLogger(JwtAuthEntryPoint.class);
+	private static final Logger logger = LoggerFactory.getLogger(JwtAuthFailureHandler.class);
 
 	@Override
 	public void commence(HttpServletRequest request, HttpServletResponse response,

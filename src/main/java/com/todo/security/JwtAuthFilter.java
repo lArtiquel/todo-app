@@ -4,47 +4,60 @@ import java.io.IOException;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.todo.services.UserDetailsServiceImpl;
+import com.todo.service.AuthService;
+import com.todo.service.UserDetailsServiceImpl;
+import io.jsonwebtoken.ExpiredJwtException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
  * Filter is intended to be used before Security to fetch and parse JWT token.
  */
+@Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-    @Autowired
-    private JwtValidator jwtTokenValidator;
-
-    @Autowired
-    private JwtProvider jwtTokenProvider;
-
-    @Autowired
-    private UserDetailsServiceImpl userDetailsService;
-
     private static final Logger logger = LoggerFactory.getLogger(JwtAuthFilter.class);
+
+    @Value("${app.config.jwt.access.header}")
+    private String accessJwtHeaderName;
+
+    private JwtValidator jwtValidator;
+    private JwtProvider jwtProvider;
+    private UserDetailsServiceImpl userDetailsService;
+    private JwtParser jwtParser;
+
+    @Autowired
+    public JwtAuthFilter(JwtValidator jwtValidator, JwtProvider jwtProvider, UserDetailsServiceImpl userDetailsService, JwtParser jwtParser) {
+        this.jwtValidator = jwtValidator;
+        this.jwtProvider = jwtProvider;
+        this.userDetailsService = userDetailsService;
+        this.jwtParser = jwtParser;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         try {
-            // get jwt token from req header
-            String jwt = parseJwt(request);
+            // get jwt access token from req header
+            final String jwt = jwtParser.getJwtFromHeader(request, accessJwtHeaderName);
 
-            // validate jwt token
-            if (jwt != null && jwtTokenValidator.validateJwtToken(jwt)) {
+            // validate jwt access token
+            if (jwt != null && jwtValidator.validateAccessJwt(jwt)) {
                 // get userId from jwt token
-                final String id = jwtTokenProvider.getUserIdFromJwt(jwt);
+                final String id = jwtProvider.getUserIdFromAccessJwt(jwt);
                 // get user details
                 final UserDetails userDetails = userDetailsService.loadUserById(id);
                 // create authentication token
@@ -61,16 +74,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
-    }
-
-    private String parseJwt(HttpServletRequest request) {
-        String headerAuth = request.getHeader("Authorization");
-
-        if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
-            return headerAuth.substring("Bearer ".length());
-        }
-
-        return null;
     }
 
 }

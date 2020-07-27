@@ -1,4 +1,4 @@
-package com.todo.models;
+package com.todo.model;
 
 public enum ERole {
   ROLE_USER,

@@ -7,10 +7,16 @@ import java.util.List;
 import java.util.Set;
 
 @Data
-public class JwtResponse implements IResponsePayload {
+public class LoginResponse implements IResponsePayload {
 
     @NonNull
     private String accessToken;
+
+    @NonNull
+    private Long accessTokenExpiredInSeconds;
+
+    @NonNull
+    private String refreshToken;
 
     @NonNull
     private Set<String> roles;

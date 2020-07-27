@@ -1,6 +1,5 @@
-package com.todo.models;
+package com.todo.model;
 
-import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 

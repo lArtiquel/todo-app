@@ -1,9 +1,12 @@
 package com.todo.security;
 
-import com.todo.services.UserDetailsImpl;
+import com.todo.model.AccessToken;
+import com.todo.model.RefreshToken;
+import com.todo.repository.RefreshTokenRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -14,51 +17,87 @@ import java.util.Date;
 @Component
 public class JwtProvider {
 
-    @Value("${app.config.jwtSecret}")
-    private String jwtSecret;
+    @Value("${app.config.accessJwtSecret}")
+    private String accessJwtSecret;
 
-    @Value("${app.config.jwtExpirationMs}")
-    private long jwtExpirationMs;
+    @Value("${app.config.accessJwtExpirationS}")
+    private Integer accessJwtExpirationS;
 
-//    @Value("${app.config.jwtRefreshSecret}")
-//    private String jwtRefreshSecret;
-//
-//    @Value("${app.config.jwtRefreshExpirationMs}")
-//    private long jwtRefreshExpirationMs;
+    @Value("${app.config.refreshJwtSecret}")
+    private String refreshJwtSecret;
+
+    @Value("${app.config.refreshJwtExpirationS}")
+    private Integer refreshJwtExpirationS;
+
+    @Autowired
+    private RefreshTokenRepository refreshTokenRepository;
 
     /**
-     * Generates access token from a principal object.
+     * Generates access token and sets user id as a subject.
+     * @param userId to set as jwt payload.
+     * @return Access token object.
      */
-    public String generateJwt(Authentication authentication) {
-        Instant expiryDate = Instant.now().plusMillis(jwtExpirationMs);
-        UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
+    public AccessToken generateAccessJwt(String userId) {
+        final Instant expiryDate = Instant.now().plusSeconds(accessJwtExpirationS);
 
+        final String token = Jwts.builder()
+                                .setSubject(userId)
+                                .setIssuedAt(new Date())
+                                .setExpiration(Date.from(expiryDate))
+                                .signWith(SignatureAlgorithm.HS512, accessJwtSecret)
+                                .compact();
+
+        return new AccessToken(token, expiryDate.getEpochSecond());
+    }
+
+    /**
+     * Generates refresh token.
+     * @param userId that asks to generate the token.
+     * @return Refresh token object.
+     */
+    public String generateRefreshJwt(String userId) {
+        // calculate expiration date
+        final Instant expiryDate = Instant.now().plusSeconds(refreshJwtExpirationS);
+
+        // create token info model
+        final RefreshToken refreshToken = new RefreshToken(userId, expiryDate.getEpochSecond());
+
+        // save refresh token info model in db
+        refreshTokenRepository.save(refreshToken);
+
+        // generate refresh token, set token id as a subject
         return Jwts.builder()
-                .setSubject((userPrincipal.getId()))
-                .setIssuedAt(new Date())
-                .setExpiration(Date.from(expiryDate))
-                .signWith(SignatureAlgorithm.HS512, jwtSecret)
-                .compact();
+                    .setSubject(refreshToken.getId())
+                    .setIssuedAt(new Date())
+                    .setExpiration(Date.from(expiryDate))
+                    .signWith(SignatureAlgorithm.HS512, refreshJwtSecret)
+                    .compact();
     }
 
     /**
      * Returns the user id encapsulated within the token.
      */
-    public String getUserIdFromJwt(String token) {
-        Claims claims = Jwts.parser().
-                setSigningKey(jwtSecret).
-                parseClaimsJws(token).
-                getBody();
+    public String getUserIdFromAccessJwt(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(accessJwtSecret)
+                .parseClaimsJws(token)
+                .getBody();
 
         return claims.getSubject();
     }
 
     /**
-     * Return the jwt expiration for the client so that they can execute
-     * the refresh token logic appropriately
+     * Returns token id encapsulated within the token.
      */
-    public long getExpiryDuration() {
-        return jwtExpirationMs;
+    public String getTokenIdFromRefreshJwt(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(refreshJwtSecret)
+                .parseClaimsJws(token)
+                .getBody();
+
+        return claims.getSubject();
     }
+
+    public int getRefreshJwtMaxAgeInSec() { return refreshJwtExpirationS; }
 
 }

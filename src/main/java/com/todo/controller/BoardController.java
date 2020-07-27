@@ -1,4 +1,4 @@
-package com.todo.controllers;
+package com.todo.controller;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;

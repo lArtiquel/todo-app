@@ -78,8 +78,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/board/admin").hasRole("ADMIN")
                 .antMatchers("/api/board/user").hasRole("USER")
                 .antMatchers("/api/auth/logout", "/api/auth/refresh").hasAnyRole("USER", "ADMIN")
-                .antMatchers("/api/auth/**", "/api/board/all").permitAll()
-                .anyRequest().denyAll();
+                .antMatchers("/api/auth/**", "/api/board/all").permitAll();
     }
 
 }

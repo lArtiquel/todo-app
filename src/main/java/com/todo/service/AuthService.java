@@ -29,6 +29,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/** Authentication service. */
 @Service
 public class AuthService {
 

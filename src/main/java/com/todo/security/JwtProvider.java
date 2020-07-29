@@ -79,6 +79,13 @@ public class JwtProvider {
         return refreshTokenModel;
     }
 
+    /**
+     * Operations:
+     * - Update refresh token expiration time in db.
+     * - Issue new refresh token.
+     * - Set new token to the model and return.
+     * @param refreshTokenModel refresh token model to update
+     */
     public RefreshToken updateRefreshToken(RefreshToken refreshTokenModel) {
         // update token expiration date in db
         final Instant expiryDate = Instant.now().plusSeconds(refreshJwtExpirationS);
@@ -123,6 +130,7 @@ public class JwtProvider {
         return claims.getSubject();
     }
 
+    /** Refresh JWT max age defined in props. */
     public int getRefreshJwtMaxAgeInSec() { return refreshJwtExpirationS; }
 
 }

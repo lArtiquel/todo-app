@@ -3,12 +3,15 @@ package com.todo.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+/** Roles collection model. */
 @Document(collection = "roles")
 public class Role {
 
+    /** Generated role id */
     @Id
     private String id;
 
+    /** Role name */
     private ERole name;
 
     public String getId() {

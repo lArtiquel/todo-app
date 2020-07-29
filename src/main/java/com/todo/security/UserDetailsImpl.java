@@ -10,9 +10,7 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/**
- * Builds user details from passed user info.
- */
+/** Builds user details from passed user info. */
 @AllArgsConstructor
 @Data
 public class UserDetailsImpl implements UserDetails {

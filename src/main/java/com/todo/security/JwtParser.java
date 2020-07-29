@@ -6,6 +6,7 @@ import org.springframework.util.StringUtils;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
+/** Used to fetch jwt tokens from the header and cookies. */
 @Component
 public class JwtParser {
 

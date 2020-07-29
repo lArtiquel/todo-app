@@ -10,6 +10,10 @@ import com.todo.payload.response.LoginResponse;
 import com.todo.payload.response.RefreshResponse;
 import com.todo.security.UserDetailsImpl;
 import com.todo.service.AuthService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
@@ -51,6 +55,15 @@ public class AuthController {
      *  - Fetch user authorities.
      *  - Publish login event on success.
      */
+    @Operation(summary = "Login user.")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200", description = "User logged in successfully. Provided below is payload schema.",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = LoginResponse.class)) }),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "401", description = "Wrong credentials provided.",
+                    content = @Content)})
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest, HttpServletResponse response) {
         // authenticate user
@@ -83,6 +96,15 @@ public class AuthController {
      * - Issue new access and update passed refresh token.
      * - Add updated refresh token to the cookies.
      */
+    @Operation(summary = "Refresh tokens.")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200", description = "Token refreshed successfully.",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = RefreshResponse.class)) }),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "401", description = "Invalid token.",
+                    content = @Content)})
     @PostMapping("/refresh")
     public ResponseEntity<?> refresh(@CookieValue(name="RefreshToken") String refreshJwt, // Don't forget to change annotation name if u changed it in app.props
                                      HttpServletResponse response) {
@@ -106,6 +128,18 @@ public class AuthController {
     /**
      * Endpoint for new user registering.
      */
+    @Operation(summary = "Register user.")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200", description = "User registered successfully.",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = RefreshResponse.class)) }),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "409", description = "User with such username already exists.",
+                    content = @Content),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "500", description = "No such role on server.",
+                    content = @Content)})
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest registerRequest) {
         authService.register(registerRequest);
@@ -121,8 +155,16 @@ public class AuthController {
      * - Validate refresh token.
      * - Withdraw refresh token.
      */
+    @Operation(summary = "Logout user.")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200", description = "User logged out successfully.",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = RefreshResponse.class)) }),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "401", description = "Refresh token failed validation.",
+                    content = @Content)})
     @PostMapping("/logout")
-    @PreAuthorize("hasAnyRole(\"USER\", \"ADMIN\")")
     public ResponseEntity<?> logout(
             @CookieValue(name="RefreshToken") String refreshJwt) { // Don't forget to change annotation name if u changed it in app.props
         // validate refresh token

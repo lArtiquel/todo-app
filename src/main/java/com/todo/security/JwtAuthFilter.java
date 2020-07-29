@@ -24,7 +24,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
- * Filter is intended to be used before Security to fetch and parse JWT token.
+ * Filter is intended to be used before Security to fetch and parse JWT access token.
  */
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {

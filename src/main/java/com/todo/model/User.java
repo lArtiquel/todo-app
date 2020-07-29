@@ -9,22 +9,24 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.Set;
 
+/** Users collection model. */
 @Document(collection = "users")
 public class User {
 
     @Id
     private String id;
 
-    // create index to know whether username is unique or not
+    /** Unique username */
     @Indexed(unique=true)
     @NotBlank
-    @Size(max = 20)
+    @Size(max = 40)
     private String username;
 
+    /** Hashed password */
     @NotBlank
     private String password;
 
-    // create reference to roles collection
+    /** Set of user roles(referenced to the Roles collection) */
     @DBRef
     private Set<Role> roles;
 

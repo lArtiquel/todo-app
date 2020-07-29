@@ -1,12 +1,8 @@
 package com.todo.service;
 
-import com.todo.exception.BadRoleException;
 import com.todo.model.*;
 import com.todo.payload.request.LoginRequest;
 import com.todo.payload.request.RegisterRequest;
-import com.todo.payload.response.ApiResponse;
-import com.todo.payload.response.LoginResponse;
-import com.todo.payload.response.RefreshResponse;
 import com.todo.repository.RefreshTokenRepository;
 import com.todo.repository.RoleRepository;
 import com.todo.repository.UserRepository;
@@ -16,14 +12,16 @@ import com.todo.security.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
@@ -56,110 +54,100 @@ public class AuthService {
         this.jwtValidator = jwtValidator;
     }
 
-    public ResponseEntity<?> login(LoginRequest loginRequest, HttpServletResponse response) {
+    /**
+     * Authenticates user with provided credentials
+     * @param loginRequest login credentials from request
+     * @return user details
+     * @throws ResponseStatusException if user provided wrong credentials.
+     */
+    public UserDetailsImpl authenticateUser(LoginRequest loginRequest) throws ResponseStatusException {
+        try {
+            // authenticate user with provided credentials
+            final Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),
+                            loginRequest.getPassword()));
 
-        // authenticate user with provided username and password
-        final Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+            // set authentication in security context
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        // set authentication object in Security context
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+            // fetch user details
+            return (UserDetailsImpl) authentication.getPrincipal();
+        } catch (AuthenticationException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Wrong credentials provided!", e);
+        }
+    }
 
-        // get user details of authenticated user
-        final UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+    /** Generates access token. */
+    public AccessToken generateAccessToken(String userId) {
+        return jwtProvider.generateAccessJwt(userId);
+    }
 
-        // generate access and refresh jwt tokens
-        final AccessToken accessToken = jwtProvider.generateAccessJwt(userDetails.getId());
-        final String refreshTokenStr = jwtProvider.generateRefreshJwt(userDetails.getId());
+    /** Generates refresh token. */
+    public RefreshToken generateRefreshToken(String userId) {
+        return jwtProvider.generateRefreshJwt(userId);
+    }
 
-        // create new cookie from refresh token
-        final Cookie refreshCookie = createCookie(refreshJwtCookieName, refreshTokenStr,
-                jwtProvider.getRefreshJwtMaxAgeInSec(),
-                true, true,
-                "/api/auth" // send this cookie only for /api/auth endpoint
-        );
+    /** Creates refresh token cookie. */
+    public Cookie createRefreshTokenCookie(RefreshToken refreshToken) {
+        // create a cookie
+        final Cookie cookie = new Cookie(refreshJwtCookieName, refreshToken.getToken());
 
-        // add refresh token cookie to response
-        response.addCookie(refreshCookie);
+        // set expiration time, secure, httpOnly and path attributes
+        cookie.setMaxAge(jwtProvider.getRefreshJwtMaxAgeInSec());
+        cookie.setSecure(false); // TODO: Change back to secure in production (localhost is not https)
+        cookie.setHttpOnly(true);
+        cookie.setPath("/api/auth");
 
-        // convert set of user's granted authorities to set the set of strings
-        final Set<String> authorities = userDetails.getAuthorities()
+        return cookie;
+    }
+
+    /** Creates cookie in response .*/
+    public void addCookieToTheResponse(HttpServletResponse response, Cookie cookie) {
+        response.addCookie(cookie);
+    }
+
+    /** Returns set of user's granted authorities. */
+    public Set<String> getSetOfAuthorities(UserDetails userDetails) {
+        return userDetails.getAuthorities()
                 .stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toSet());
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(new ApiResponse<>(false,
-                        "Authentication success!",
-                        new LoginResponse(accessToken.getToken(),
-                                accessToken.getExpiredInSeconds(),
-                                refreshTokenStr,
-                                authorities)));
     }
 
-    public ResponseEntity<?> refresh(String refreshJwt, HttpServletResponse response) {
-        // validate refresh jwt
-        if(jwtValidator.validateRefreshJwt(refreshJwt)){
-            // fetch token id from jwt
-            final String refreshTokenModelId = jwtProvider.getTokenIdFromRefreshJwt(refreshJwt);
+    /**
+     * Validates token and fetches it from db.
+     * @return Fetched refresh token model stored in db
+     * @throws ResponseStatusException
+     */
+    public RefreshToken validateRefreshTokenAndFetchItsModel(String refreshJwt) throws ResponseStatusException {
+        // check jwt token on validity
+        if(!jwtValidator.validateRefreshJwt(refreshJwt))
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Refresh token validation not passed!");
 
-            // fetch refresh token from database
-            final Optional<RefreshToken> refreshTokenModel = refreshTokenRepository.findById(refreshTokenModelId);
-
-            if(refreshTokenModel.isPresent()) {
-
-                // generate new access and refresh jwt tokens
-                final AccessToken newAccessToken = jwtProvider.generateAccessJwt(refreshTokenModel.get().getUserId());
-                final String newRefreshTokenStr = jwtProvider.generateRefreshJwt(refreshTokenModel.get().getUserId());
-
-                // replace old token with new in db
-                refreshTokenRepository.deleteById(refreshTokenModelId);
-
-                // create new cookie from refresh token
-                final Cookie refreshCookie = createCookie(refreshJwtCookieName, newRefreshTokenStr,
-                        jwtProvider.getRefreshJwtMaxAgeInSec(),
-                        true, true,
-                        "/api/auth" // send this cookie only for /api/auth endpoint
-                );
-
-                // add refresh token cookie to response
-                response.addCookie(refreshCookie);
-
-                return ResponseEntity
-                        .status(HttpStatus.OK)
-                        .body(new ApiResponse<>(false,
-                                "Token refreshing success!",
-                                new RefreshResponse(newAccessToken.getToken(),
-                                        newAccessToken.getExpiredInSeconds(),
-                                        newRefreshTokenStr)));
-            } else {
-                return ResponseEntity
-                        .status(HttpStatus.UNAUTHORIZED)
-                        .body(new ApiResponse<>(true,
-                                "Wrong refresh token!"));
-            }
-        } else {
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body(new ApiResponse<>(true,
-                            "Invalid refresh jwt!"));
-        }
+        // check if there is such token in database
+        final String refreshTokenModelId = jwtProvider.getTokenIdFromRefreshJwt(refreshJwt);
+        final Optional<RefreshToken> refreshToken = refreshTokenRepository.findById(refreshTokenModelId);
+        if(refreshToken.isPresent())
+            return refreshToken.get();
+        else
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Non-existent refresh token provided!");
     }
 
-    public ResponseEntity<?> register(RegisterRequest registerRequest) {
+    /** Updates refresh token */
+    public RefreshToken updateRefreshToken(RefreshToken refreshToken) {
+        return jwtProvider.updateRefreshToken(refreshToken);
+    }
 
-        // verify whether user with such username already exists
+    /** Register new user service. */
+    public void register(RegisterRequest registerRequest) throws ResponseStatusException {
+        // check if user with such username already exists in db
         if (userRepository.existsByUsername(registerRequest.getUsername())) {
-            return ResponseEntity
-                    .status(HttpStatus.CONFLICT)
-                    .body(new ApiResponse(true,
-                            "User with such username already exists!"));
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "User with such username already exists!");
         }
 
-        // get user Role from database
+        // get user Role from db
         final Role role = roleRepository.findByName(ERole.ROLE_USER)
-                .orElseThrow(() -> new BadRoleException("Error: No such role!"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "No such role!"));
 
         // create new user's account
         final User user = new User(registerRequest.getUsername(),
@@ -168,57 +156,11 @@ public class AuthService {
 
         // save new user in db
         userRepository.save(user);
-
-        // return success status
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(new ApiResponse(false,
-                        "Registration success!"));
     }
 
-    public ResponseEntity<?> logout(String refreshJwt) {
-        // validate refresh jwt
-        if(jwtValidator.validateRefreshJwt(refreshJwt)) {
-            // get refresh token model id
-            final String refreshTokenModelId = jwtProvider.getTokenIdFromRefreshJwt(refreshJwt);
-
-            final Optional<RefreshToken> refreshTokenModel = refreshTokenRepository.findById(refreshTokenModelId);
-
-            if(refreshTokenModel.isPresent()){
-                // remove refresh token from database
-                refreshTokenRepository.deleteById(refreshTokenModelId);
-
-                return ResponseEntity
-                        .status(HttpStatus.OK)
-                        .body(new ApiResponse<>(false,
-                                "Logout success!"));
-
-            } else {
-                return ResponseEntity
-                        .status(HttpStatus.UNAUTHORIZED)
-                        .body(new ApiResponse<>(true,
-                                "Wrong refresh token!"));
-            }
-        } else {
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body(new ApiResponse<>(true,
-                            "Invalid refresh token!"));
-        }
-    }
-
-    private Cookie createCookie(String name, String value,
-                                       int maxAge, boolean secure, boolean httpOnly, String path) {
-        // create a cookie
-        final Cookie cookie = new Cookie(name, value);
-
-        // set expiration time, secure, httpOnly and path attributes
-        cookie.setMaxAge(maxAge);
-        cookie.setSecure(false); // TODO: Change back to secure(needed to test thru postman, localhost is not https)
-        cookie.setHttpOnly(httpOnly);
-        cookie.setPath(path);
-
-        return cookie;
+    /** Delete refresh token from db. */
+    public void withdrawRefreshToken(RefreshToken refreshToken) {
+        refreshTokenRepository.deleteById(refreshToken.getId());
     }
 
 }

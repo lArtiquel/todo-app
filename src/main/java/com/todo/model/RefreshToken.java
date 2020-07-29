@@ -1,6 +1,7 @@
 package com.todo.model;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
@@ -13,6 +14,10 @@ public class RefreshToken {
     /** Refresh token id. */
     @Id
     private String id;
+
+    /** Actual refresh token. Field is transient, means it not persisted in database. */
+    @Transient
+    private String token;
 
     /** User id who owns the token. */
     private String userId;
@@ -31,6 +36,14 @@ public class RefreshToken {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public String getUserId() {

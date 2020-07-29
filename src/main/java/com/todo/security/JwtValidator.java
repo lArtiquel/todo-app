@@ -1,13 +1,12 @@
 package com.todo.security;
 
-import com.todo.exception.NoSuchTokenTypeException;
+import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-
-import io.jsonwebtoken.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @Component
 public class JwtValidator {
@@ -41,7 +40,7 @@ public class JwtValidator {
 				jwtSecret = accessJwtSecret;
 			} else if (tokenType == ETokenTypes.REFRESH_TOKEN) {
 				jwtSecret = refreshJwtSecret;
-			} else throw new NoSuchTokenTypeException("Wrong token type!");
+			} else throw new RuntimeException("Wrong token type!");
 
 			// parse jwt token
 			Jwts.parser()
@@ -59,8 +58,8 @@ public class JwtValidator {
 			logger.error("JWT token is unsupported: {}", e.getMessage());
 		} catch (IllegalArgumentException e) {
 			logger.error("JWT claims string is empty: {}", e.getMessage());
-		} catch (NoSuchTokenTypeException e) {
-			logger.error("JWT secret assigning failed: {}", e.getMessage());
+		} catch (RuntimeException e){
+			logger.error("Error while fetching secret key: {}", e.getMessage());
 		}
 
 		return false;
@@ -69,12 +68,12 @@ public class JwtValidator {
 	/**
 	 * Validates jwt access token.
 	 */
-	public boolean validateAccessJwt(String authToken) {
-		return validateJwt(authToken, ETokenTypes.ACCESS_TOKEN);
+	public boolean validateAccessJwt(String token) {
+		return validateJwt(token, ETokenTypes.ACCESS_TOKEN);
 	}
 
 	/**
 	 * Validates refresh jwt token.
 	 */
-	public boolean validateRefreshJwt(String authToken) { return validateJwt(authToken, ETokenTypes.REFRESH_TOKEN); }
+	public boolean validateRefreshJwt(String token) { return validateJwt(token, ETokenTypes.REFRESH_TOKEN); }
 }

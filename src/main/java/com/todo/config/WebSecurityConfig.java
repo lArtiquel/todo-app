@@ -6,6 +6,7 @@ import com.todo.service.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -74,10 +75,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
                 .authorizeRequests()
-                .antMatchers("/api/auth/**", "/api/board/**").permitAll()
-            .and()
-                .authorizeRequests()
-                .anyRequest().authenticated();
+                .antMatchers("/api/board/admin").hasRole("ADMIN")
+                .antMatchers("/api/board/user").hasRole("USER")
+                .antMatchers("/api/auth/logout", "/api/auth/refresh").hasAnyRole("USER", "ADMIN")
+                .antMatchers("/api/auth/**", "/api/board/all").permitAll()
+                .anyRequest().denyAll();
     }
 
 }

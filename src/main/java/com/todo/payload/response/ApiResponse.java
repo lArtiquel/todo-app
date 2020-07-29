@@ -7,13 +7,14 @@ import lombok.Data;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+import java.time.Instant;
+
 /**
  * Generic Api Response model.
  * @param <T> payload type
  */
-@AllArgsConstructor
-@RequiredArgsConstructor
 @Data
+@JsonInclude(Include.NON_NULL)
 public class ApiResponse<T extends IResponsePayload> {
 
     /**
@@ -29,9 +30,18 @@ public class ApiResponse<T extends IResponsePayload> {
     private String message;
 
     /**
-     * Some payload provided by server. Field is not requred.
+     * Some payload provided by server. Payload is not required.
      */
-    @JsonInclude(Include.NON_NULL)
     private T payload;
 
+    public ApiResponse(@NonNull Boolean error, @NonNull String message, T payload) {
+        this.error = error;
+        this.message = message;
+        this.payload = payload;
+    }
+
+    public ApiResponse(@NonNull Boolean error, @NonNull String message) {
+        this.error = error;
+        this.message = message;
+    }
 }

@@ -20,13 +20,13 @@ public class JwtAuthFailureHandler implements AuthenticationEntryPoint {
 
 	private static final Logger logger = LoggerFactory.getLogger(JwtAuthFailureHandler.class);
 
+	/** This method is invoked when user tries to access a secured REST resource without supplying any credentials. */
 	@Override
 	public void commence(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException authException) throws IOException, ServletException {
-		// This is invoked when user tries to access a secured REST resource without supplying any credentials
-		// We should just send a 401 Unauthorized response because there is no 'login page' to redirect to
 		logger.error("Unauthorized error: {}", authException.getMessage());
-		response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Error: Unauthorized");
+		// just send a 401 Unauthorized response because there is no 'login page' to redirect to
+		response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Prevented from accessing protected route without supplying any credentials!");
 	}
 
 }

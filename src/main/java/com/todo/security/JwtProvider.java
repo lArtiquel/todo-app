@@ -55,23 +55,48 @@ public class JwtProvider {
      * @param userId that asks to generate the token.
      * @return Refresh token object.
      */
-    public String generateRefreshJwt(String userId) {
+    public RefreshToken generateRefreshJwt(String userId) {
         // calculate expiration date
         final Instant expiryDate = Instant.now().plusSeconds(refreshJwtExpirationS);
 
         // create token info model
-        final RefreshToken refreshToken = new RefreshToken(userId, expiryDate.getEpochSecond());
+        final RefreshToken refreshTokenModel = new RefreshToken(userId, expiryDate.getEpochSecond());
 
         // save refresh token info model in db
-        refreshTokenRepository.save(refreshToken);
+        refreshTokenRepository.save(refreshTokenModel); // it's important to have this operation before token issuing because it sets id which needed there
 
         // generate refresh token, set token id as a subject
-        return Jwts.builder()
-                    .setSubject(refreshToken.getId())
+        final String refreshToken = Jwts.builder()
+                    .setSubject(refreshTokenModel.getId())
                     .setIssuedAt(new Date())
                     .setExpiration(Date.from(expiryDate))
                     .signWith(SignatureAlgorithm.HS512, refreshJwtSecret)
                     .compact();
+
+        // add refresh token to the model (yeah we are not persisting him)
+        refreshTokenModel.setToken(refreshToken);
+
+        return refreshTokenModel;
+    }
+
+    public RefreshToken updateRefreshToken(RefreshToken refreshTokenModel) {
+        // update token expiration date in db
+        final Instant expiryDate = Instant.now().plusSeconds(refreshJwtExpirationS);
+        refreshTokenModel.setExpiredInSeconds(expiryDate.getEpochSecond());
+        refreshTokenRepository.save(refreshTokenModel); // it's important to have this operation before token issuing because it sets id which needed there
+
+        // now issue new token
+        final String newRefreshToken = Jwts.builder()
+                .setSubject(refreshTokenModel.getId())
+                .setIssuedAt(new Date())
+                .setExpiration(Date.from(expiryDate))
+                .signWith(SignatureAlgorithm.HS512, refreshJwtSecret)
+                .compact();
+
+        // set new token to the module
+        refreshTokenModel.setToken(newRefreshToken);
+
+        return refreshTokenModel;
     }
 
     /**

@@ -33,4 +33,4 @@ build/
 .vscode/
 
 ### Ignore production properties ###
-*-prod.properties
+application-prod.properties

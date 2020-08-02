@@ -12,15 +12,13 @@ export default function LoginPage() {
     <Container>
       <Header
         leftContent={
-          <Box mx={2}>
-            <Typography variant="h4">Welcome to Arti's ToDoDo app</Typography>
-          </Box>
+          <Typography variant="h4">Welcome to Arti's ToDoDo app</Typography>
         }
-        rightContent={() => (
+        rightContent={
           <CoolButton color="red" component={Link} to="/register">
             Register
           </CoolButton>
-        )}
+        }
       />
       <CenteredFlexContainer>
         <LoginForm />

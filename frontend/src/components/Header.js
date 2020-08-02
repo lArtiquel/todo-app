@@ -6,12 +6,12 @@ const Header = ({ leftContent, rightContent }) => {
   return (
     <Box display="flex" my={2} boxShadow={8}>
       {leftContent && (
-        <Box flexGrow={2} my={1}>
+        <Box flexGrow={100} m={2}>
           {leftContent}
         </Box>
       )}
       {rightContent && (
-        <Box flexGrow={1} my={1}>
+        <Box flexGrow={1} m={2}>
           {rightContent}
         </Box>
       )}

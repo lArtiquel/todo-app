@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 import Theme from './theme'
 import LoginPage from './pages/login'
 import RegisterPage from './pages/register'
+import TodoPage from './pages/todo'
 
 const App = () => {
   return (
@@ -21,9 +22,9 @@ const App = () => {
           {/* <Route path="/forgot" exact>
           <ForgotPage />
         </Route> */}
-          {/* <Route path="/home" exact>
-            <HomePage />
-          </Route> */}
+          <Route path="/" exact>
+            <TodoPage />
+          </Route>
         </Switch>
       </Router>
     </ThemeProvider>

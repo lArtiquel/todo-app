@@ -4,10 +4,10 @@ const Theme = responsiveFontSizes(
   createMuiTheme({
     palette: {
       type: 'dark',
-      primary: { main: '#9c27b0' },
-      secondary: { main: '#2732b0' },
+      primary: { main: '#ff9800' },
+      secondary: { main: '#ff1744' },
       text: {
-        secondary: '#fff'
+        primary: '#fff'
       }
     },
     spreddable: {}

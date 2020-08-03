@@ -22,11 +22,7 @@ function TabPanel(props) {
       aria-labelledby={`full-width-tab-${index}`}
       {...other}
     >
-      {value === index && (
-        <Box p={3}>
-          <Typography>{children}</Typography>
-        </Box>
-      )}
+      {value === index && <Box p={3}>{children}</Box>}
     </div>
   )
 }
@@ -104,17 +100,32 @@ export default function Tabs() {
       >
         <TabPanel value={value} index={0} dir={theme.direction}>
           {TODOS.map((todo) => (
-            <Todo id={todo.id} content={todo.content} />
+            <Todo
+              key={todo.id}
+              id={todo.id}
+              isDone={todo.isDone}
+              content={todo.content}
+            />
           ))}
         </TabPanel>
         <TabPanel value={value} index={1} dir={theme.direction}>
           {TODOS.filter((todo) => todo.isDone === false).map((todo) => (
-            <Todo id={todo.id} content={todo.content} />
+            <Todo
+              key={todo.id}
+              id={todo.id}
+              isDone={todo.isDone}
+              content={todo.content}
+            />
           ))}
         </TabPanel>
         <TabPanel value={value} index={2} dir={theme.direction}>
           {TODOS.filter((todo) => todo.isDone === true).map((todo) => (
-            <Todo id={todo.id} content={todo.content} />
+            <Todo
+              key={todo.id}
+              id={todo.id}
+              isDone={todo.isDone}
+              content={todo.content}
+            />
           ))}
         </TabPanel>
       </SwipeableViews>

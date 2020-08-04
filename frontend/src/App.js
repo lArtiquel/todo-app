@@ -5,7 +5,7 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 import Theme from './theme'
 import LoginPage from './pages/login'
 import RegisterPage from './pages/register'
-import TodoPage from './pages/todo'
+import TaskPage from './pages/task'
 
 const App = () => {
   return (
@@ -23,7 +23,7 @@ const App = () => {
           <ForgotPage />
         </Route> */}
           <Route path="/" exact>
-            <TodoPage />
+            <TaskPage />
           </Route>
         </Switch>
       </Router>

@@ -1,5 +1,4 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import SwipeableViews from 'react-swipeable-views'
 import { makeStyles, useTheme } from '@material-ui/core/styles'
 import {
@@ -9,7 +8,10 @@ import {
   Typography,
   Box
 } from '@material-ui/core'
+import { connect } from 'react-redux'
+import PropTypes from 'prop-types'
 import Todo from './Todo'
+import { getTodos } from '../store/selectors/taskSelector'
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props
@@ -46,25 +48,7 @@ function a11yProps(index) {
   }
 }
 
-const TODOS = [
-  {
-    id: 'FirstID',
-    isDone: true,
-    content: 'First todo'
-  },
-  {
-    id: 'SecondID',
-    isDone: false,
-    content: 'Second todo'
-  },
-  {
-    id: 'ThirdID',
-    isDone: false,
-    content: 'Third todo'
-  }
-]
-
-export default function Tabs() {
+const Tabs = ({ todos }) => {
   const classes = useStyles()
   const theme = useTheme()
   const [value, setValue] = React.useState(0)
@@ -99,7 +83,7 @@ export default function Tabs() {
         onChangeIndex={handleChangeIndex}
       >
         <TabPanel value={value} index={0} dir={theme.direction}>
-          {TODOS.map((todo) => (
+          {todos.map((todo) => (
             <Todo
               key={todo.id}
               id={todo.id}
@@ -109,26 +93,42 @@ export default function Tabs() {
           ))}
         </TabPanel>
         <TabPanel value={value} index={1} dir={theme.direction}>
-          {TODOS.filter((todo) => todo.isDone === false).map((todo) => (
-            <Todo
-              key={todo.id}
-              id={todo.id}
-              isDone={todo.isDone}
-              content={todo.content}
-            />
-          ))}
+          {todos
+            .filter((todo) => todo.isDone === false)
+            .map((todo) => (
+              <Todo
+                key={todo.id}
+                id={todo.id}
+                isDone={todo.isDone}
+                content={todo.content}
+              />
+            ))}
         </TabPanel>
         <TabPanel value={value} index={2} dir={theme.direction}>
-          {TODOS.filter((todo) => todo.isDone === true).map((todo) => (
-            <Todo
-              key={todo.id}
-              id={todo.id}
-              isDone={todo.isDone}
-              content={todo.content}
-            />
-          ))}
+          {todos
+            .filter((todo) => todo.isDone === true)
+            .map((todo) => (
+              <Todo
+                key={todo.id}
+                id={todo.id}
+                isDone={todo.isDone}
+                content={todo.content}
+              />
+            ))}
         </TabPanel>
       </SwipeableViews>
     </div>
   )
 }
+
+Tabs.propTypes = {
+  todos: PropTypes.array.isRequired
+}
+
+const mapStateToProps = (state) => {
+  return {
+    todos: getTodos(state)
+  }
+}
+
+export default connect(mapStateToProps, null)(Tabs)

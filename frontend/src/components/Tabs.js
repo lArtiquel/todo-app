@@ -83,38 +83,43 @@ const Tabs = ({ my, todos }) => {
         onChangeIndex={handleChangeIndex}
       >
         <TabPanel value={value} index={0} dir={theme.direction}>
-          {todos.map((todo) => (
-            <Todo
-              key={todo.id}
-              id={todo.id}
-              isDone={todo.isDone}
-              todoBody={todo.body}
-            />
-          ))}
+          {value === 0 &&
+            todos.map((todo) => {
+              return (
+                <Todo
+                  key={todo.id}
+                  id={todo.id}
+                  isDone={todo.isDone}
+                  todoBody={todo.body}
+                />
+              )
+            })}
         </TabPanel>
         <TabPanel value={value} index={1} dir={theme.direction}>
-          {todos
-            .filter((todo) => todo.isDone === false)
-            .map((todo) => (
-              <Todo
-                key={todo.id}
-                id={todo.id}
-                isDone={todo.isDone}
-                todoBody={todo.body}
-              />
-            ))}
+          {value === 1 &&
+            todos
+              .filter((todo) => todo.isDone === false)
+              .map((todo) => (
+                <Todo
+                  key={todo.id}
+                  id={todo.id}
+                  isDone={todo.isDone}
+                  todoBody={todo.body}
+                />
+              ))}
         </TabPanel>
         <TabPanel value={value} index={2} dir={theme.direction}>
-          {todos
-            .filter((todo) => todo.isDone === true)
-            .map((todo) => (
-              <Todo
-                key={todo.id}
-                id={todo.id}
-                isDone={todo.isDone}
-                todoBody={todo.body}
-              />
-            ))}
+          {value === 2 &&
+            todos
+              .filter((todo) => todo.isDone === true)
+              .map((todo) => (
+                <Todo
+                  key={todo.id}
+                  id={todo.id}
+                  isDone={todo.isDone}
+                  todoBody={todo.body}
+                />
+              ))}
         </TabPanel>
       </SwipeableViews>
     </Box>

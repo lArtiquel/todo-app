@@ -36,12 +36,12 @@ const TodoInput = ({ my, addTodo }) => {
   )
 
   useEffect(() => {
-    if (inputRef.current) {
+    if (inputRef.current)
       inputRef.current.addEventListener('keyup', addTodoEnterKeyCallback)
-    }
 
     return () => {
-      inputRef.current.removeEventListener('keyup', addTodoEnterKeyCallback)
+      if (inputRef.current)
+        inputRef.current.removeEventListener('keyup', addTodoEnterKeyCallback)
     }
   }, [inputRef.current, addTodoEnterKeyCallback])
 

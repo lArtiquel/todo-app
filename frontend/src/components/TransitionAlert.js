@@ -31,7 +31,7 @@ const TransitionAlert = ({
       setOpen(true)
       setTimerId(
         setTimeout(() => {
-          console.log(lastDeletedTodoId)
+          // this will work cause func remembers `lastDeletedTodoId` that was in the scope at the creation time
           deletePermanently(lastDeletedTodoId)
         }, 5000)
       )

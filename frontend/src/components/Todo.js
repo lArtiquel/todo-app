@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { Box, IconButton, TextField, Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import DoneRoundedIcon from '@material-ui/icons/DoneRounded'
@@ -40,6 +40,7 @@ const Todo = ({
   const styles = useStyles()
   const [isEditing, setEditing] = useState(false)
   const [newTodoBody, setNewTodoBody] = useState(todoBody)
+  const todoRef = useRef()
 
   const closeEdit = () => {
     setEditing(false)
@@ -60,22 +61,24 @@ const Todo = ({
       if (e.key === 'Enter' || e.keyCode === 13) {
         editTodo(id, newTodoBody)
         setEditing(false)
+        e.stopPropagation()
       }
     },
     [newTodoBody]
   )
 
   useEffect(() => {
-    if (isEditing) {
-      document.addEventListener('keyup', editTodoEnterKeyCallback)
-    } else {
-      document.removeEventListener('keyup', editTodoEnterKeyCallback)
+    if (isEditing && todoRef.current)
+      todoRef.current.addEventListener('keyup', editTodoEnterKeyCallback)
+
+    return () => {
+      if (isEditing && todoRef.current)
+        todoRef.current.removeEventListener('keyup', editTodoEnterKeyCallback)
     }
-    return () => document.removeEventListener('keyup', editTodoEnterKeyCallback)
-  }, [isEditing, editTodoEnterKeyCallback])
+  }, [todoRef.current, isEditing, editTodoEnterKeyCallback])
 
   return (
-    <Box display="flex">
+    <Box display="flex" ref={todoRef}>
       {isEditing ? (
         <>
           <TextField

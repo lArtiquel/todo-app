@@ -48,7 +48,7 @@ function a11yProps(index) {
   }
 }
 
-const Tabs = ({ todos }) => {
+const Tabs = ({ my, todos }) => {
   const classes = useStyles()
   const theme = useTheme()
   const [value, setValue] = React.useState(0)
@@ -62,7 +62,7 @@ const Tabs = ({ todos }) => {
   }
 
   return (
-    <div className={classes.root}>
+    <Box className={classes.root} my={my}>
       <AppBar position="static" color="default">
         <MuiTabs
           value={value}
@@ -88,7 +88,7 @@ const Tabs = ({ todos }) => {
               key={todo.id}
               id={todo.id}
               isDone={todo.isDone}
-              content={todo.content}
+              todoBody={todo.body}
             />
           ))}
         </TabPanel>
@@ -100,7 +100,7 @@ const Tabs = ({ todos }) => {
                 key={todo.id}
                 id={todo.id}
                 isDone={todo.isDone}
-                content={todo.content}
+                todoBody={todo.body}
               />
             ))}
         </TabPanel>
@@ -112,16 +112,17 @@ const Tabs = ({ todos }) => {
                 key={todo.id}
                 id={todo.id}
                 isDone={todo.isDone}
-                content={todo.content}
+                todoBody={todo.body}
               />
             ))}
         </TabPanel>
       </SwipeableViews>
-    </div>
+    </Box>
   )
 }
 
 Tabs.propTypes = {
+  my: PropTypes.number,
   todos: PropTypes.array.isRequired
 }
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Box, IconButton, TextField, Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import DoneRoundedIcon from '@material-ui/icons/DoneRounded'
@@ -32,41 +32,47 @@ const useStyles = makeStyles((theme) => ({
 const Todo = ({
   id,
   isDone,
-  content,
+  todoBody,
   toggleTodoState,
   editTodo,
   toggleTodoToBeDeletedState
 }) => {
   const styles = useStyles()
   const [isEditing, setEditing] = useState(false)
-  const [todoContent, setTodoContent] = useState(content)
+  const [newTodoBody, setNewTodoBody] = useState(todoBody)
 
-  const onCloseEdit = () => {
+  const closeEdit = () => {
     setEditing(false)
-    setTodoContent(content)
+    setNewTodoBody(todoBody)
   }
 
-  const onEditTodo = () => {
+  const handleEditTodoChange = (e) => {
+    setNewTodoBody(e.target.value)
+  }
+
+  const handleEditTodoButtonClick = () => {
+    editTodo(id, newTodoBody)
     setEditing(false)
-    editTodo(id, todoContent)
   }
 
-  const onEditTodoEvent = (e) => {
-    if (e.key === 'Enter' || e.keyCode === 13) {
-      setEditing(false)
-      editTodo(id, todoContent)
-    }
-  }
+  const editTodoEnterKeyCallback = useCallback(
+    (e) => {
+      if (e.key === 'Enter' || e.keyCode === 13) {
+        editTodo(id, newTodoBody)
+        setEditing(false)
+      }
+    },
+    [newTodoBody]
+  )
 
   useEffect(() => {
     if (isEditing) {
-      // check key
-      window.addEventListener('keyup', onEditTodoEvent)
+      document.addEventListener('keyup', editTodoEnterKeyCallback)
     } else {
-      window.removeEventListener('keyup', onEditTodoEvent)
+      document.removeEventListener('keyup', editTodoEnterKeyCallback)
     }
-    return () => window.removeEventListener('keyup', onEditTodoEvent)
-  }, [isEditing])
+    return () => document.removeEventListener('keyup', editTodoEnterKeyCallback)
+  }, [isEditing, editTodoEnterKeyCallback])
 
   return (
     <Box display="flex">
@@ -76,20 +82,20 @@ const Todo = ({
             variant="outlined"
             margin="dense"
             fullWidth
-            value={todoContent}
-            onChange={(e) => setTodoContent(e.target.value)}
+            value={newTodoBody}
+            onChange={handleEditTodoChange}
           />
           <IconButton
             aria-label="cancel"
             className={styles.dangerColor}
-            onClick={onCloseEdit}
+            onClick={closeEdit}
           >
             <CloseRoundedIcon />
           </IconButton>
           <IconButton
             aria-label="confirmEdit"
             className={styles.successColor}
-            onClick={onEditTodo}
+            onClick={handleEditTodoButtonClick}
           >
             <DoneRoundedIcon />
           </IconButton>
@@ -108,7 +114,7 @@ const Todo = ({
               className={isDone ? styles.crossedTextDecoration : ''}
               variant="body1"
             >
-              {content}
+              {todoBody}
             </Typography>
           </Box>
           <IconButton
@@ -134,7 +140,7 @@ const Todo = ({
 Todo.propTypes = {
   id: PropTypes.string.isRequired,
   isDone: PropTypes.bool.isRequired,
-  content: PropTypes.string.isRequired,
+  todoBody: PropTypes.string.isRequired,
   toggleTodoState: PropTypes.func.isRequired,
   editTodo: PropTypes.func.isRequired,
   toggleTodoToBeDeletedState: PropTypes.func.isRequired

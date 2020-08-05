@@ -7,31 +7,31 @@ const initState = {
     {
       id: 'FirstID',
       isDone: true,
-      content: 'First todo',
+      body: 'First todo',
       isMarkedToBeDeleted: false
     },
     {
       id: 'SecondID',
       isDone: false,
-      content: 'Second todo',
+      body: 'Second todo',
       isMarkedToBeDeleted: false
     },
     {
       id: 'ThirdID',
       isDone: false,
-      content: 'Third todo',
+      body: 'Third todo',
       isMarkedToBeDeleted: false
     },
     {
       id: '4',
       isDone: true,
-      content: 'Clean floor.',
+      body: 'Clean floor.',
       isMarkedToBeDeleted: false
     },
     {
       id: '5',
       isDone: true,
-      content: 'Wash dishes.',
+      body: 'Wash dishes.',
       isMarkedToBeDeleted: false
     }
   ]
@@ -76,7 +76,7 @@ export default function TaskReducer(state = initState, action) {
             if (todo.id === action.payload.id)
               return {
                 ...todo,
-                content: action.payload.content
+                body: action.payload.body
               }
             return todo
           })
@@ -97,14 +97,19 @@ export default function TaskReducer(state = initState, action) {
             return todo
           })
         ],
-        lastDeletedTodoId: action.payload
+        lastDeletedTodoId:
+          action.payload === state.lastDeletedTodoId ? '' : action.payload
       }
     }
 
     case TaskActions.DELETE_TODO_PERMANENTLY: {
       return {
         ...state,
-        todos: [...state.todos.filter((todo) => todo.id !== action.payload)]
+        todos: [...state.todos.filter((todo) => todo.id !== action.payload)],
+        lastDeletedTodoId:
+          action.payload === state.lastDeletedTodoId
+            ? ''
+            : state.lastDeletedTodoId
       }
     }
 

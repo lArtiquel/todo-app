@@ -8,12 +8,12 @@ export const LoadTodosAction = () => {
   }
 }
 
-export const AddTodoAction = (todoContent) => {
+export const AddTodoAction = (body) => {
   return (dispatch, getState) => {
     // make call to api and push passed todo to reducer
     const exampleTodo = {
       id: (Math.random() * 101010100).toString(),
-      content: todoContent,
+      body,
       isDone: false
     }
     dispatch({ type: TaskActions.ADD_TODO, payload: exampleTodo })
@@ -27,10 +27,10 @@ export const ToggleTodoStateAction = (id) => {
   }
 }
 
-export const EditTodoAction = (id, content) => {
+export const EditTodoAction = (id, body) => {
   return (dispatch, getState) => {
     // edit todo(use PATCH)
-    dispatch({ type: TaskActions.EDIT_TODO, payload: { id, content } })
+    dispatch({ type: TaskActions.EDIT_TODO, payload: { id, body } })
   }
 }
 

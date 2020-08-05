@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import Alert from '@material-ui/lab/Alert'
-import { Button } from '@material-ui/core/'
+import { Button, Box } from '@material-ui/core'
 import Collapse from '@material-ui/core/Collapse'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -11,6 +11,7 @@ import {
 } from '../store/actions/taskActions'
 
 const TransitionAlert = ({
+  my,
   content,
   lastDeletedTodoId,
   toggleTodoToBeDeletedState,
@@ -19,47 +20,45 @@ const TransitionAlert = ({
   const [open, setOpen] = useState(true)
   const [timerId, setTimerId] = useState()
 
-  const clearTimer = () => {
+  const handleUndoClick = () => {
+    toggleTodoToBeDeletedState(lastDeletedTodoId)
     clearTimeout(timerId)
+    setOpen(false)
   }
 
   useEffect(() => {
     if (lastDeletedTodoId) {
       setOpen(true)
       setTimerId(
-        // eslint-disable-next-line no-shadow
-        setTimeout((lastDeletedTodoId) => {
+        setTimeout(() => {
+          console.log(lastDeletedTodoId)
           deletePermanently(lastDeletedTodoId)
         }, 5000)
       )
     } else {
       setOpen(false)
     }
-    return () => clearTimer()
   }, [lastDeletedTodoId])
 
   return (
-    <Collapse in={open}>
-      <Alert
-        action={
-          <Button
-            color="inherit"
-            size="small"
-            onClick={() => {
-              toggleTodoToBeDeletedState(lastDeletedTodoId)
-            }}
-          >
-            UNDO
-          </Button>
-        }
-      >
-        {content}
-      </Alert>
-    </Collapse>
+    <Box my={my}>
+      <Collapse in={open}>
+        <Alert
+          action={
+            <Button color="inherit" size="small" onClick={handleUndoClick}>
+              UNDO
+            </Button>
+          }
+        >
+          {content}
+        </Alert>
+      </Collapse>
+    </Box>
   )
 }
 
 TransitionAlert.propTypes = {
+  my: PropTypes.number,
   content: PropTypes.string.isRequired,
   lastDeletedTodoId: PropTypes.string.isRequired,
   toggleTodoToBeDeletedState: PropTypes.func.isRequired,

@@ -24,12 +24,14 @@ public class TodoService {
         this.todoRepository = todoRepository;
     }
 
+    @Transactional
     public List<Todo> getAll() {
         final UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
         return todoRepository.findAllByOwnerId(userDetails.getId());
     }
 
+    @Transactional
     public Todo createTodo(String todoBody) {
         final UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
@@ -37,6 +39,7 @@ public class TodoService {
         return todoRepository.save(todo);
     }
 
+    @Transactional
     public void toggleTodoIsDoneFlag(String todoId) {
         final UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
@@ -46,6 +49,7 @@ public class TodoService {
         todoRepository.save(todo);
     }
 
+    @Transactional
     public void changeTodoBody(String todoId, String todoBody) {
         final UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
@@ -55,6 +59,7 @@ public class TodoService {
         todoRepository.save(todo);
     }
 
+    @Transactional
     public void deleteTodo(String todoId) {
         final UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();

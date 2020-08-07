@@ -77,8 +77,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/api/board/admin").hasRole("ADMIN")
                 .antMatchers("/api/board/user").hasRole("USER")
-                .antMatchers("/api/auth/logout", "/api/auth/refresh").hasAnyRole("USER", "ADMIN")
-                .antMatchers("/api/auth/**", "/api/board/all").permitAll();
+                .antMatchers("/api/auth/logout").hasAnyRole("USER", "ADMIN")
+                .antMatchers("/api/auth/**", "/api/board/all").permitAll()
+                .antMatchers("/api/**").hasAnyRole("USER");
     }
 
 }

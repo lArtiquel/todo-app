@@ -1,11 +1,12 @@
 import React from 'react'
-import { makeStyles, ThemeProvider } from '@material-ui/core/styles'
+import { ThemeProvider } from '@material-ui/core/styles'
 import { CssBaseline } from '@material-ui/core'
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 import Theme from './theme'
 import LoginPage from './pages/login'
 import RegisterPage from './pages/register'
 import TaskPage from './pages/task'
+import RouteProtector from './components/RouteProtector'
 
 const App = () => {
   return (
@@ -14,16 +15,22 @@ const App = () => {
       <Router>
         <Switch>
           <Route path="/login" exact>
-            <LoginPage />
+            <RouteProtector routeFor="NOT_AUTHENTICATED">
+              <LoginPage />
+            </RouteProtector>
           </Route>
           <Route path="/register" exact>
-            <RegisterPage />
+            <RouteProtector routeFor="NOT_AUTHENTICATED">
+              <RegisterPage />
+            </RouteProtector>
           </Route>
           {/* <Route path="/forgot" exact>
           <ForgotPage />
         </Route> */}
           <Route path="/" exact>
-            <TaskPage />
+            <RouteProtector routeFor="AUTHENTICATED_ONLY">
+              <TaskPage />
+            </RouteProtector>
           </Route>
         </Switch>
       </Router>

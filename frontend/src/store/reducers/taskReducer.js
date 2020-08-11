@@ -1,8 +1,9 @@
 import { TaskActions } from '../../constants/actions'
 
 const initState = {
+  isLoading: false,
+  errorMessage: '',
   lastDeletedTodoId: '',
-
   todos: [
     {
       id: 'FirstID',
@@ -39,6 +40,13 @@ const initState = {
 
 export default function TaskReducer(state = initState, action) {
   switch (action.type) {
+    case TaskActions.LOAD_TODOS: {
+      return {
+        ...state,
+        todos: action.payload
+      }
+    }
+
     case TaskActions.ADD_TODO: {
       return {
         ...state,
@@ -110,6 +118,20 @@ export default function TaskReducer(state = initState, action) {
           action.payload === state.lastDeletedTodoId
             ? ''
             : state.lastDeletedTodoId
+      }
+    }
+
+    case TaskActions.SET_IS_LOADING_STATE: {
+      return {
+        ...state,
+        isLoading: action.payload
+      }
+    }
+
+    case TaskActions.SET_ERROR_MESSAGE: {
+      return {
+        ...state,
+        errorMessage: action.payload
       }
     }
 

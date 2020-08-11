@@ -1,7 +1,8 @@
 import { AuthActions } from '../../constants/actions'
+import { AuthState } from '../../constants/authStates'
 
 const initState = {
-  isAutthenticated: false,
+  isAuthenticated: AuthState.UNDEFINED,
   accessToken: '',
   accessTokenExpiryDate: ''
 }

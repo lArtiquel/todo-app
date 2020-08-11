@@ -5,3 +5,7 @@ export const getTodos = (state) => {
 export const getDeletedTodoId = (state) => {
   return state.task.lastDeletedTodoId
 }
+
+export const getLoadingState = (state) => {
+  return state.task.isLoading
+}

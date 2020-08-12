@@ -1,4 +1,4 @@
-import { TaskActions } from '../../constants/actions'
+import { TaskActions } from '../../constants/taskActions'
 
 const initState = {
   isLoading: false,

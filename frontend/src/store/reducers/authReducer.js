@@ -1,14 +1,30 @@
-import { AuthActions } from '../../constants/actions'
+import { AuthActions } from '../../constants/auth'
 import { AuthState } from '../../constants/authStates'
 
 const initState = {
   isAuthenticated: AuthState.UNDEFINED,
+  errorMessage: '',
   accessToken: '',
   accessTokenExpiryDate: ''
 }
 
 export default function AuthReducer(state = initState, action) {
   switch (action.type) {
+    case AuthActions.SET_NEW_ACCESS_TOKEN: {
+      return {
+        ...state,
+        accessToken: action.payload.accessToken,
+        accessTokenExpiryDate: action.payload.accessTokenExpiryDate // check that name!
+      }
+    }
+
+    case AuthActions.UPDATE_AUTH_STATE: {
+      return {
+        ...state,
+        isAuthenticated: action.payload
+      }
+    }
+
     default:
       return {
         ...state

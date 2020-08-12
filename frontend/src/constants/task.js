@@ -8,3 +8,5 @@ export const TaskActions = {
   SET_IS_LOADING_STATE: 'SET_IS_LOADING_STATE',
   SET_ERROR_MESSAGE: 'SET_ERROR_MESSAGE'
 }
+
+export default TaskActions

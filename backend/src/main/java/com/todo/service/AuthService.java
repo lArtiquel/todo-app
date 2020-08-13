@@ -65,7 +65,7 @@ public class AuthService {
         try {
             // authenticate user with provided credentials
             final Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),
+                    new UsernamePasswordAuthenticationToken(loginRequest.getEmail(),
                             loginRequest.getPassword()));
 
             // set authentication in security context
@@ -142,7 +142,7 @@ public class AuthService {
     /** Register new user service. */
     public void register(RegisterRequest registerRequest) throws ResponseStatusException {
         // check if user with such username already exists in db
-        if (userRepository.existsByUsername(registerRequest.getUsername())) {
+        if (userRepository.existsByEmail(registerRequest.getEmail())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "User with such username already exists!");
         }
 
@@ -151,7 +151,7 @@ public class AuthService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "No such role!"));
 
         // create new user's account
-        final User user = new User(registerRequest.getUsername(),
+        final User user = new User(registerRequest.getEmail(),
                 passwordEncoder.encode(registerRequest.getPassword()),
                 Set.of(role));
 

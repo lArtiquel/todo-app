@@ -9,3 +9,7 @@ export const getDeletedTodoId = (state) => {
 export const getLoadingState = (state) => {
   return state.task.isLoading
 }
+
+export const getMessage = (state) => {
+  return state.task.message
+}

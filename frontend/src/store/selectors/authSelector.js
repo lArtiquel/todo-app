@@ -5,3 +5,7 @@ export const getAuthState = (state) => {
 export const getAuthAccessToken = (state) => {
   return state.auth.accessToken
 }
+
+export const getAuthMessage = (state) => {
+  return state.auth.message
+}

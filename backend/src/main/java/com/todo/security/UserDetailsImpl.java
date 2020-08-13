@@ -11,16 +11,28 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /** Builds user details from passed user info. */
-@AllArgsConstructor
-@Data
+@RequiredArgsConstructor
 public class UserDetailsImpl implements UserDetails {
 
+    @NonNull
+    @Getter @Setter
     private String id;
 
+    // this field is redundant in this app
+    // but it needed here because UserDetails have it
+    @Getter
     private String username;
 
+    @NonNull
+    @Getter @Setter
+    private String email;
+
+    @NonNull
+    @Getter @Setter
     private String password;
 
+    @NonNull
+    @Getter @Setter
     private Collection<? extends GrantedAuthority> authorities;
 
     public static UserDetailsImpl build(User user) {
@@ -31,14 +43,9 @@ public class UserDetailsImpl implements UserDetails {
 
         return new UserDetailsImpl(
                 user.getId(),
-                user.getUsername(),
+                user.getEmail(),
                 user.getPassword(),
                 authorities);
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return authorities;
     }
 
     @Override

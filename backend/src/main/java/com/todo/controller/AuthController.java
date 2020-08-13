@@ -127,7 +127,7 @@ public class AuthController {
             @ApiResponse(
                     responseCode = "200", description = "User registered successfully.",
                     content = { @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = RefreshResponse.class)) }),
+                            schema = @Schema(implementation = PlainMessageResponse.class)) }),
             @ApiResponse(
                     responseCode = "409", description = "User with such username already exists.",
                     content = @Content),
@@ -153,7 +153,7 @@ public class AuthController {
             @ApiResponse(
                     responseCode = "200", description = "User logged out successfully.",
                     content = { @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = RefreshResponse.class)) }),
+                            schema = @Schema(implementation = PlainMessageResponse.class)) }),
             @ApiResponse(
                     responseCode = "401", description = "Refresh token failed validation.",
                     content = @Content)})

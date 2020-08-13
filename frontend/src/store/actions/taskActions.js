@@ -21,7 +21,7 @@ export const LoadTodosAction = () => {
       .catch((error) => {
         // set request error
         dispatch({
-          type: TaskActions.SET_ERROR_MESSAGE,
+          type: TaskActions.SET_MESSAGE,
           payload: error.message
         })
       })
@@ -47,7 +47,7 @@ export const AddTodoAction = (body) => {
       })
       .catch((error) => {
         dispatch({
-          type: TaskActions.SET_ERROR_MESSAGE,
+          type: TaskActions.SET_MESSAGE,
           payload: error.message
         })
       })
@@ -67,7 +67,7 @@ export const ToggleTodoStateAction = (id) => {
       })
       .catch((error) => {
         dispatch({
-          type: TaskActions.SET_ERROR_MESSAGE,
+          type: TaskActions.SET_MESSAGE,
           payload: error.message
         })
       })
@@ -89,7 +89,7 @@ export const EditTodoAction = (id, body) => {
       })
       .catch((error) => {
         dispatch({
-          type: TaskActions.SET_ERROR_MESSAGE,
+          type: TaskActions.SET_MESSAGE,
           payload: error.message
         })
       })
@@ -115,7 +115,7 @@ export const DeleteTodoPermanentlyAction = (id) => {
       })
       .catch((error) => {
         dispatch({
-          type: TaskActions.SET_ERROR_MESSAGE,
+          type: TaskActions.SET_MESSAGE,
           payload: error.message
         })
       })
@@ -124,5 +124,5 @@ export const DeleteTodoPermanentlyAction = (id) => {
 }
 
 export const ClearErrorMessageAction = () => {
-  return { type: TaskActions.SET_ERROR_MESSAGE, payload: '' }
+  return { type: TaskActions.SET_MESSAGE, payload: '' }
 }

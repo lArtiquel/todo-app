@@ -1,5 +1,5 @@
 import React from 'react'
-import { Typography, Box } from '@material-ui/core'
+import { Typography } from '@material-ui/core'
 import { Link } from 'react-router-dom'
 import Container from '../../components/Container'
 import CenteredFlexContainer from '../../components/CenteredFlexContainer'
@@ -12,7 +12,7 @@ export default function LoginPage() {
     <Container>
       <Header
         leftContent={
-          <Typography variant="h4">Welcome to Arti's ToDoDo app</Typography>
+          <Typography variant="h4">Welcome to Arti's TODO app</Typography>
         }
         rightContent={
           <CoolButton color="red" component={Link} to="/register">

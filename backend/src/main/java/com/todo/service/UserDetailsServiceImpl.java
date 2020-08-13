@@ -26,7 +26,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Transactional
     public UserDetails loadUserById(String id) throws UsernameNotFoundException {
         final User user = userRepository.findById(id)
-                .orElseThrow(() -> new UsernameNotFoundException("Error: User Not Found with such id: " + id));
+                .orElseThrow(() -> new UsernameNotFoundException("User Not Found with such id: " + id));
 
         return UserDetailsImpl.build(user);
     }
@@ -34,6 +34,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     /**
      * Default {@code UserDetailsService} method to get user details.
      * Gets user from db by username and builds user details.
+     * This is default service method of fetching user.
+     * No needed in this app, cause username field is not used here.
      * @param username user's name
      * @return user details object
      * @throws UsernameNotFoundException
@@ -41,8 +43,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Transactional
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        final User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User Not Found with such id: " + username));
+        final User user = userRepository.findByEmail(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User Not Found with such username: " + username));
 
         return UserDetailsImpl.build(user);
     }

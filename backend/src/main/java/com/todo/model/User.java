@@ -20,7 +20,7 @@ public class User {
     @Indexed(unique=true)
     @NotBlank
     @Size(max = 40)
-    private String username;
+    private String email;
 
     /** Hashed password */
     @NotBlank
@@ -30,8 +30,8 @@ public class User {
     @DBRef
     private Set<Role> roles;
 
-    public User(@NotBlank @Size(max = 20) String username, @NotBlank String password, Set<Role> roles) {
-        this.username = username;
+    public User(@NotBlank @Size(max = 40) String email, @NotBlank String password, Set<Role> roles) {
+        this.email = email;
         this.password = password;
         this.roles = roles;
     }
@@ -44,12 +44,12 @@ public class User {
         this.id = id;
     }
 
-    public String getUsername() {
-        return username;
+    public String getEmail() {
+        return email;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPassword() {
@@ -67,5 +67,4 @@ public class User {
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
-
 }

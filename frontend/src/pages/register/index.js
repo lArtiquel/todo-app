@@ -11,7 +11,7 @@ export default function RegisterPage() {
       <Header
         leftContent={
           <Typography variant="h4" align="center">
-            Welcome to Arti's ToDoDo app
+            Welcome to Arti's TODO app
           </Typography>
         }
       />

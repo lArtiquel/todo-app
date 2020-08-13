@@ -3,9 +3,8 @@ import { AuthState } from '../../constants/authStates'
 
 const initState = {
   isAuthenticated: AuthState.UNDEFINED,
-  errorMessage: '',
-  accessToken: '',
-  accessTokenExpiryDate: ''
+  message: '',
+  accessToken: ''
 }
 
 export default function AuthReducer(state = initState, action) {
@@ -13,8 +12,7 @@ export default function AuthReducer(state = initState, action) {
     case AuthActions.SET_NEW_ACCESS_TOKEN: {
       return {
         ...state,
-        accessToken: action.payload.accessToken,
-        accessTokenExpiryDate: action.payload.accessTokenExpiryDate // check that name!
+        accessToken: action.payload.accessToken
       }
     }
 
@@ -22,6 +20,13 @@ export default function AuthReducer(state = initState, action) {
       return {
         ...state,
         isAuthenticated: action.payload
+      }
+    }
+
+    case AuthActions.SET_MESSAGE: {
+      return {
+        ...state,
+        message: action.payload
       }
     }
 

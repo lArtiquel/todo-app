@@ -2,16 +2,22 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { useHistory } from 'react-router-dom'
-import { getAuthState } from '../store/selectors/authSelector'
+import { getAuthState, getAuthMessage } from '../store/selectors/authSelector'
 import { AuthState } from '../constants/authStates'
 import LoadingScreen from './LoadingScreen'
-import { DefineAuthStateAction } from '../store/actions/authActions'
+import {
+  DefineAuthStateAction,
+  ClearErrorMessageAction
+} from '../store/actions/authActions'
+import Dialog from './KeepInTouchDialog'
 
 const RouteProtector = ({
   routeFor,
   children,
   isAuthenticated,
-  defineAuthState
+  defineAuthState,
+  authDialogMessage,
+  closeDialogMessage
 }) => {
   const history = useHistory()
 
@@ -54,25 +60,40 @@ const RouteProtector = ({
     }
   }
 
-  return <>{resolveRoute()}</>
+  return (
+    <>
+      {resolveRoute()}
+      {authDialogMessage && (
+        <Dialog
+          header="Auth information"
+          message={authDialogMessage}
+          closeCallback={closeDialogMessage}
+        />
+      )}
+    </>
+  )
 }
 
 RouteProtector.propTypes = {
   routeFor: PropTypes.oneOf(['AUTHENTICATED_ONLY', 'NOT_AUTHENTICATED']),
   children: PropTypes.node.isRequired,
   isAuthenticated: PropTypes.string.isRequired,
-  defineAuthState: PropTypes.func.isRequired
+  defineAuthState: PropTypes.func.isRequired,
+  authDialogMessage: PropTypes.string.isRequired,
+  closeDialogMessage: PropTypes.func.isRequired
 }
 
 const mapStateToProps = (state) => {
   return {
-    isAuthenticated: getAuthState(state)
+    isAuthenticated: getAuthState(state),
+    authDialogMessage: getAuthMessage(state)
   }
 }
 
 const mapActionsToProps = (dispatch) => {
   return {
-    defineAuthState: () => dispatch(DefineAuthStateAction())
+    defineAuthState: () => dispatch(DefineAuthStateAction()),
+    closeDialogMessage: () => dispatch(ClearErrorMessageAction())
   }
 }
 

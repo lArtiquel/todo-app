@@ -1,8 +1,8 @@
-import { TaskActions } from '../../constants/taskActions'
+import { TaskActions } from '../../constants/task'
 
 const initState = {
   isLoading: false,
-  errorMessage: '',
+  message: '',
   lastDeletedTodoId: '',
   todos: [
     {
@@ -128,7 +128,7 @@ export default function TaskReducer(state = initState, action) {
       }
     }
 
-    case TaskActions.SET_ERROR_MESSAGE: {
+    case TaskActions.SET_MESSAGE: {
       return {
         ...state,
         errorMessage: action.payload

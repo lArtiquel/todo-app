@@ -8,9 +8,11 @@ import Tabs from '../../components/Tabs'
 import TransitionAlert from '../../components/TransitionAlert'
 import TodoInput from '../../components/TodoInput'
 import LoadingScreen from '../../components/LoadingScreen'
-import { getLoadingState } from '../../store/selectors/taskSelector'
+import { getLoadingState, getMessage } from '../../store/selectors/taskSelector'
+import { ClearErrorMessageAction } from '../../store/actions/taskActions'
+import Dialog from '../../components/KeepInTouchDialog'
 
-const TaskPage = ({ isLoading }) => {
+const TaskPage = ({ isLoading, todoDialogMessage, closeDialogMessage }) => {
   return (
     <>
       {isLoading ? (
@@ -30,6 +32,13 @@ const TaskPage = ({ isLoading }) => {
           <TodoInput my={3} />
           <TransitionAlert my={2} content="Task deleted!" />
           <Tabs my={2} />
+          {todoDialogMessage && (
+            <Dialog
+              header="Todo information"
+              message={todoDialogMessage}
+              closeCallback={closeDialogMessage}
+            />
+          )}
         </Container>
       )}
     </>
@@ -37,13 +46,22 @@ const TaskPage = ({ isLoading }) => {
 }
 
 TaskPage.propTypes = {
-  isLoading: PropTypes.bool.isRequired
+  isLoading: PropTypes.bool.isRequired,
+  todoDialogMessage: PropTypes.string.isRequired,
+  closeDialogMessage: PropTypes.func.isRequired
 }
 
 const mapStateToProps = (state) => {
   return {
-    isLoading: getLoadingState(state)
+    isLoading: getLoadingState(state),
+    todoDialogMessage: getMessage(state)
   }
 }
 
-export default connect(mapStateToProps, null)(TaskPage)
+const mapActionsToProps = (dispatch) => {
+  return {
+    closeDialogMessage: () => dispatch(ClearErrorMessageAction())
+  }
+}
+
+export default connect(mapStateToProps, mapActionsToProps)(TaskPage)

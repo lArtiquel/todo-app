@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.todo</groupId>
-	<artifactId>SpringMongoJWT</artifactId>
+	<artifactId>SpringMongoJWTTodoApp</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>SpringMongoJWT</name>
 	<description>Spring Boot, Security JWT todo app</description>

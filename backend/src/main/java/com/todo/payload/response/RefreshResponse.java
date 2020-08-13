@@ -4,13 +4,10 @@ import lombok.Data;
 import lombok.NonNull;
 
 @Data
-public class RefreshResponse implements IResponsePayload {
+public class RefreshResponse {
 
     @NonNull
     private String accessToken;
-
-    @NonNull
-    private Long accessTokenExpiredInSeconds;
 
     @NonNull
     private String refreshToken;

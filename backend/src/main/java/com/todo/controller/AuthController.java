@@ -5,21 +5,21 @@ import com.todo.model.AccessToken;
 import com.todo.model.RefreshToken;
 import com.todo.payload.request.LoginRequest;
 import com.todo.payload.request.RegisterRequest;
-import com.todo.payload.response.ApiResponse;
 import com.todo.payload.response.LoginResponse;
+import com.todo.payload.response.PlainMessageResponse;
 import com.todo.payload.response.RefreshResponse;
 import com.todo.security.UserDetailsImpl;
 import com.todo.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -57,11 +57,11 @@ public class AuthController {
      */
     @Operation(summary = "Login user.")
     @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "200", description = "User logged in successfully. Provided below is payload schema.",
                     content = { @Content(mediaType = "application/json",
                             schema = @Schema(implementation = LoginResponse.class)) }),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "401", description = "Wrong credentials provided.",
                     content = @Content)})
     @PostMapping("/login")
@@ -81,12 +81,9 @@ public class AuthController {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new ApiResponse<>(false,
-                        "Authentication success!",
-                        new LoginResponse(accessToken.getToken(),
-                                accessToken.getExpiredInSeconds(),
+                .body(new LoginResponse(accessToken.getToken(),
                                 refreshToken.getToken(),
-                                setOfAuthorities)));
+                                setOfAuthorities));
     }
 
     /**
@@ -98,11 +95,11 @@ public class AuthController {
      */
     @Operation(summary = "Refresh tokens.")
     @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "200", description = "Token refreshed successfully.",
                     content = { @Content(mediaType = "application/json",
                             schema = @Schema(implementation = RefreshResponse.class)) }),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "401", description = "Invalid token.",
                     content = @Content)})
     @PostMapping("/refresh")
@@ -118,11 +115,8 @@ public class AuthController {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new ApiResponse<>(false,
-                        "Token refresh success!",
-                        new RefreshResponse(newAccessToken.getToken(),
-                                newAccessToken.getExpiredInSeconds(),
-                                updatedRefreshToken.getToken())));
+                .body(new RefreshResponse(newAccessToken.getToken(),
+                                updatedRefreshToken.getToken()));
     }
 
     /**
@@ -130,14 +124,14 @@ public class AuthController {
      */
     @Operation(summary = "Register user.")
     @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "200", description = "User registered successfully.",
                     content = { @Content(mediaType = "application/json",
                             schema = @Schema(implementation = RefreshResponse.class)) }),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "409", description = "User with such username already exists.",
                     content = @Content),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "500", description = "No such role on server.",
                     content = @Content)})
     @PostMapping("/register")
@@ -145,8 +139,7 @@ public class AuthController {
         authService.register(registerRequest);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new ApiResponse(false,
-                        "User registered successfully!"));
+                .body(new PlainMessageResponse("User registered successfully!"));
     }
 
     /**
@@ -157,11 +150,11 @@ public class AuthController {
      */
     @Operation(summary = "Logout user.")
     @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "200", description = "User logged out successfully.",
                     content = { @Content(mediaType = "application/json",
                             schema = @Schema(implementation = RefreshResponse.class)) }),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "401", description = "Refresh token failed validation.",
                     content = @Content)})
     @PostMapping("/logout")
@@ -173,8 +166,7 @@ public class AuthController {
         authService.withdrawRefreshToken(refreshToken);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new ApiResponse(false,
-                        "User logged out successfully!"));
+                .body(new PlainMessageResponse("User logged out successfully!"));
     }
 
 }

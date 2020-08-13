@@ -7,13 +7,10 @@ import java.util.List;
 import java.util.Set;
 
 @Data
-public class LoginResponse implements IResponsePayload {
+public class LoginResponse{
 
     @NonNull
     private String accessToken;
-
-    @NonNull
-    private Long accessTokenExpiredInSeconds;
 
     @NonNull
     private String refreshToken;

@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { useHistory } from 'react-router-dom'
+import { Route, useHistory } from 'react-router-dom'
 import { getAuthState, getAuthMessage } from '../store/selectors/authSelector'
 import { AuthState } from '../constants/authStates'
 import LoadingScreen from './LoadingScreen'
@@ -11,31 +11,30 @@ import {
 } from '../store/actions/authActions'
 import Dialog from './KeepInTouchDialog'
 
-const RouteProtector = ({
+const RouteWithProtection = ({
   routeFor,
   children,
   isAuthenticated,
   defineAuthState,
   authDialogMessage,
-  closeDialogMessage
+  closeDialogMessage,
+  ...rest
 }) => {
-  const history = useHistory()
   const [body, setBody] = useState(null)
+  const history = useHistory()
 
   const resolveAuthenticatedOnlyRouteBody = () => {
     switch (isAuthenticated) {
       case AuthState.AUTHENTICATED:
-        setBody(children)
-        break
+        return children
       case AuthState.NOT_AUTHENTICATED:
         history.replace('/login')
-        break
+        return null
       case AuthState.UNDEFINED:
         defineAuthState()
-        setBody(<LoadingScreen />)
-        break
+        return <LoadingScreen />
       default:
-        setBody(<LoadingScreen />)
+        return <LoadingScreen />
     }
   }
 
@@ -43,36 +42,34 @@ const RouteProtector = ({
     switch (isAuthenticated) {
       case AuthState.AUTHENTICATED:
         history.replace('/')
-        break
+        return null
       case AuthState.NOT_AUTHENTICATED:
-        setBody(children)
-        break
+        return children
       case AuthState.UNDEFINED:
         defineAuthState()
-        setBody(<LoadingScreen />)
-        break
+        return <LoadingScreen />
       default:
-        setBody(<LoadingScreen />)
+        return <LoadingScreen />
     }
   }
 
-  const resolveRoute = () => {
+  const resolveRoute = useCallback(() => {
     switch (routeFor) {
       case 'AUTHENTICATED_ONLY':
-        return resolveAuthenticatedOnlyRouteBody()
+        return setBody(resolveAuthenticatedOnlyRouteBody())
       case 'NOT_AUTHENTICATED':
-        return resolveNotAuthenticatedRouteBody()
+        return setBody(resolveNotAuthenticatedRouteBody())
       default:
-        return children
+        return setBody(children)
     }
-  }
+  }, [routeFor, isAuthenticated])
 
   useEffect(() => {
     resolveRoute()
-  }, [routeFor, isAuthenticated])
+  }, [resolveRoute])
 
   return (
-    <>
+    <Route {...rest}>
       {body}
       {authDialogMessage && (
         <Dialog
@@ -81,11 +78,11 @@ const RouteProtector = ({
           closeCallback={closeDialogMessage}
         />
       )}
-    </>
+    </Route>
   )
 }
 
-RouteProtector.propTypes = {
+RouteWithProtection.propTypes = {
   routeFor: PropTypes.oneOf(['AUTHENTICATED_ONLY', 'NOT_AUTHENTICATED']),
   children: PropTypes.node.isRequired,
   isAuthenticated: PropTypes.string.isRequired,
@@ -94,10 +91,10 @@ RouteProtector.propTypes = {
   closeDialogMessage: PropTypes.func.isRequired
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = () => {
   return {
-    isAuthenticated: getAuthState(state),
-    authDialogMessage: getAuthMessage(state)
+    isAuthenticated: getAuthState(),
+    authDialogMessage: getAuthMessage()
   }
 }
 
@@ -108,4 +105,4 @@ const mapActionsToProps = (dispatch) => {
   }
 }
 
-export default connect(mapStateToProps, mapActionsToProps)(RouteProtector)
+export default connect(mapStateToProps, mapActionsToProps)(RouteWithProtection)

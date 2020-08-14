@@ -24,7 +24,7 @@ export default function AuthReducer(state = initState, action) {
       }
     }
 
-    case AuthActions.SET_MESSAGE: {
+    case AuthActions.SET_AUTH_MESSAGE: {
       return {
         ...state,
         message: action.payload

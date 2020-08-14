@@ -149,7 +149,7 @@ Todo.propTypes = {
   toggleTodoToBeDeletedState: PropTypes.func.isRequired
 }
 
-const mapActionToProps = (dispatch) => {
+const mapActionsToProps = (dispatch) => {
   return {
     toggleTodoState: (id) => dispatch(ToggleTodoStateAction(id)),
     editTodo: (id, newTodoContent) =>
@@ -159,4 +159,4 @@ const mapActionToProps = (dispatch) => {
   }
 }
 
-export default connect(null, mapActionToProps)(Todo)
+export default connect(null, mapActionsToProps)(Todo)

@@ -1,13 +1,7 @@
 import React from 'react'
 import SwipeableViews from 'react-swipeable-views'
 import { makeStyles, useTheme } from '@material-ui/core/styles'
-import {
-  AppBar,
-  Tabs as MuiTabs,
-  Tab,
-  Typography,
-  Box
-} from '@material-ui/core'
+import { AppBar, Tabs as MuiTabs, Tab, Box } from '@material-ui/core'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import Todo from './Todo'
@@ -131,9 +125,9 @@ Tabs.propTypes = {
   todos: PropTypes.array.isRequired
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = () => {
   return {
-    todos: getTodos(state)
+    todos: getTodos()
   }
 }
 

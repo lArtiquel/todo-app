@@ -1,15 +1,17 @@
-export const getTodos = (state) => {
-  return state.task.todos.filter((todo) => !todo.isMarkedToBeDeleted)
+import store from '../store'
+
+export const getTodos = () => {
+  return store.getState().task.todos.filter((todo) => !todo.isMarkedToBeDeleted)
 }
 
-export const getDeletedTodoId = (state) => {
-  return state.task.lastDeletedTodoId
+export const getDeletedTodoId = () => {
+  return store.getState().task.lastDeletedTodoId
 }
 
-export const getLoadingState = (state) => {
-  return state.task.isLoading
+export const getLoadingState = () => {
+  return store.getState().task.isLoading
 }
 
-export const getMessage = (state) => {
-  return state.task.message
+export const getMessage = () => {
+  return store.getState().task.message
 }

@@ -35,4 +35,3 @@ application-prod.properties
 ### Frontend ###
 .vscode/
 node_modules/
-package-lock.json

@@ -65,9 +65,9 @@ TransitionAlert.propTypes = {
   deletePermanently: PropTypes.func.isRequired
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = () => {
   return {
-    lastDeletedTodoId: getDeletedTodoId(state)
+    lastDeletedTodoId: getDeletedTodoId()
   }
 }
 

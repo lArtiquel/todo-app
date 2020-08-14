@@ -1,7 +1,6 @@
-import axios from 'axios'
 import { AuthActions, AuthNoteName } from '../../constants/auth'
 import { AuthState } from '../../constants/authStates'
-import history from '../../config/history'
+import axios from '../../config/axios'
 
 export const SetNewAccessTokenAction = (response) => {
   return { type: AuthActions.SET_NEW_ACCESS_TOKEN, payload: response.data }
@@ -15,7 +14,7 @@ export const DefineAuthStateAction = () => {
     if (isAuthenticated) {
       // get new access token
       axios({
-        url: 'http://localhost:22222/api/auth/refresh', // refresh token should be in cookies in that time
+        url: '/api/auth/refresh', // refresh token should be in cookies in that time
         method: 'post',
         skipAuthRefresh: true // don't refresh token if we get 401 error
       })
@@ -44,12 +43,14 @@ export const DefineAuthStateAction = () => {
 export const LoginAction = (loginForm) => {
   return (dispatch) => {
     axios({
-      url: 'http://localhost:22222/api/auth/login',
+      url: '/api/auth/login',
       method: 'post',
       data: loginForm,
       skipAuthRefresh: true // don't refresh token if we get 401 error
     })
       .then((response) => {
+        // save access token in state
+        dispatch(SetNewAccessTokenAction(response))
         // set AUTHENTICATED state
         dispatch({
           type: AuthActions.UPDATE_AUTH_STATE,
@@ -62,17 +63,17 @@ export const LoginAction = (loginForm) => {
       })
       .catch(() => {
         dispatch({
-          type: AuthActions.SET_MESSAGE,
-          payload: 'Failed to authenticate.'
+          type: AuthActions.SET_AUTH_MESSAGE,
+          payload: 'Failed to login.'
         })
       })
   }
 }
 
-export const LogoutAction = () => {
+export const LogoutAction = (history) => {
   return (dispatch) => {
     axios({
-      url: 'http://localhost:22222/api/auth/logout',
+      url: '/api/auth/logout',
       method: 'post',
       skipAuthRefresh: true // don't refresh token if we get 401 error
     }).finally((response) => {
@@ -94,10 +95,10 @@ export const LogoutAction = () => {
   }
 }
 
-export const RegisterAction = (registerForm) => {
+export const RegisterAction = ({ registerForm, history }) => {
   return (dispatch) => {
     axios({
-      url: 'http://localhost:22222/api/auth/register',
+      url: '/api/auth/register',
       method: 'post',
       data: registerForm,
       skipAuthRefresh: true // don't refresh token if we get 401 error
@@ -105,7 +106,7 @@ export const RegisterAction = (registerForm) => {
       .then((response) => {
         // display message about successful registration
         dispatch({
-          type: AuthActions.SET_MESSAGE,
+          type: AuthActions.SET_AUTH_MESSAGE,
           payload: 'Successfully registered! Now try to login.'
         })
         // redirect to the login route
@@ -113,7 +114,7 @@ export const RegisterAction = (registerForm) => {
       })
       .catch((error) => {
         dispatch({
-          type: AuthActions.SET_MESSAGE,
+          type: AuthActions.SET_AUTH_MESSAGE,
           payload: error.message // sets some strange message
         })
       })
@@ -122,7 +123,7 @@ export const RegisterAction = (registerForm) => {
 
 export const ClearErrorMessageAction = () => {
   return {
-    type: AuthActions.SET_MESSAGE,
+    type: AuthActions.SET_AUTH_MESSAGE,
     payload: ''
   }
 }

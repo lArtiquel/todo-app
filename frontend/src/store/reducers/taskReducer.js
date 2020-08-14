@@ -5,36 +5,36 @@ const initState = {
   message: '',
   lastDeletedTodoId: '',
   todos: [
-    {
-      id: 'FirstID',
-      isDone: true,
-      body: 'First todo',
-      isMarkedToBeDeleted: false
-    },
-    {
-      id: 'SecondID',
-      isDone: false,
-      body: 'Second todo',
-      isMarkedToBeDeleted: false
-    },
-    {
-      id: 'ThirdID',
-      isDone: false,
-      body: 'Third todo',
-      isMarkedToBeDeleted: false
-    },
-    {
-      id: '4',
-      isDone: true,
-      body: 'Clean floor.',
-      isMarkedToBeDeleted: false
-    },
-    {
-      id: '5',
-      isDone: true,
-      body: 'Wash dishes.',
-      isMarkedToBeDeleted: false
-    }
+    // {
+    //   id: 'FirstID',
+    //   isDone: true,
+    //   body: 'First todo',
+    //   isMarkedToBeDeleted: false
+    // },
+    // {
+    //   id: 'SecondID',
+    //   isDone: false,
+    //   body: 'Second todo',
+    //   isMarkedToBeDeleted: false
+    // },
+    // {
+    //   id: 'ThirdID',
+    //   isDone: false,
+    //   body: 'Third todo',
+    //   isMarkedToBeDeleted: false
+    // },
+    // {
+    //   id: '4',
+    //   isDone: true,
+    //   body: 'Clean floor.',
+    //   isMarkedToBeDeleted: false
+    // },
+    // {
+    //   id: '5',
+    //   isDone: true,
+    //   body: 'Wash dishes.',
+    //   isMarkedToBeDeleted: false
+    // }
   ]
 }
 
@@ -44,6 +44,13 @@ export default function TaskReducer(state = initState, action) {
       return {
         ...state,
         todos: action.payload
+      }
+    }
+
+    case TaskActions.CLEAR_TODOS_ARRAY: {
+      return {
+        ...state,
+        todos: []
       }
     }
 
@@ -128,10 +135,10 @@ export default function TaskReducer(state = initState, action) {
       }
     }
 
-    case TaskActions.SET_MESSAGE: {
+    case TaskActions.SET_TASK_MESSAGE: {
       return {
         ...state,
-        errorMessage: action.payload
+        message: action.payload
       }
     }
 

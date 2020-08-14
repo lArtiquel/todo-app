@@ -1,11 +1,13 @@
-export const getAuthState = (state) => {
-  return state.auth.isAuthenticated
+import store from '../store'
+
+export const getAuthState = () => {
+  return store.getState().auth.isAuthenticated
 }
 
-export const getAuthAccessToken = (state) => {
-  return state.auth.accessToken
+export const getAuthAccessToken = () => {
+  return store.getState().auth.accessToken
 }
 
-export const getAuthMessage = (state) => {
-  return state.auth.message
+export const getAuthMessage = () => {
+  return store.getState().auth.message
 }

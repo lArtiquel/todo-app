@@ -1,6 +1,6 @@
-import axios from 'axios'
 import stringify from 'qs-stringify'
 import { TaskActions } from '../../constants/task'
+import axios from '../../config/axios'
 
 export const LoadTodosAction = () => {
   return (dispatch) => {
@@ -8,26 +8,32 @@ export const LoadTodosAction = () => {
     dispatch({ type: TaskActions.SET_IS_LOADING_STATE, payload: true })
     // make axios call to fetch all todos from server
     axios({
-      url: 'http://localhost:22222/api/todos',
+      url: '/api/todos',
       method: 'get'
     })
       .then((response) => {
         // push todos into state
         dispatch({
-          type: TaskActions.SET_IS_LOADING_STATE,
+          type: TaskActions.LOAD_TODOS,
           payload: response.data
         })
       })
       .catch((error) => {
         // set request error
         dispatch({
-          type: TaskActions.SET_MESSAGE,
+          type: TaskActions.SET_TASK_MESSAGE,
           payload: error.message
         })
       })
-    // set isLoading var in state back to false
-    dispatch({ type: TaskActions.SET_IS_LOADING_STATE, payload: false })
+      .finally(() => {
+        // set isLoading var in state back to false
+        dispatch({ type: TaskActions.SET_IS_LOADING_STATE, payload: false })
+      })
   }
+}
+
+export const ClearTodosArrayAction = () => {
+  return { type: TaskActions.CLEAR_TODOS_ARRAY }
 }
 
 export const AddTodoAction = (body) => {
@@ -35,9 +41,9 @@ export const AddTodoAction = (body) => {
     dispatch({ type: TaskActions.SET_IS_LOADING_STATE, payload: true })
     // add todo on server
     axios({
-      url: 'http://localhost:22222/api/todos',
+      url: '/api/todos',
       method: 'post',
-      params: [{ todoBody: body }]
+      data: { todoBody: body }
     })
       .then((response) => {
         dispatch({
@@ -47,11 +53,14 @@ export const AddTodoAction = (body) => {
       })
       .catch((error) => {
         dispatch({
-          type: TaskActions.SET_MESSAGE,
+          type: TaskActions.SET_TASK_MESSAGE,
           payload: error.message
         })
       })
-    dispatch({ type: TaskActions.SET_IS_LOADING_STATE, payload: false })
+      .finally(() => {
+        // set isLoading var in state back to false
+        dispatch({ type: TaskActions.SET_IS_LOADING_STATE, payload: false })
+      })
   }
 }
 
@@ -59,7 +68,7 @@ export const ToggleTodoStateAction = (id) => {
   return (dispatch) => {
     dispatch({ type: TaskActions.SET_IS_LOADING_STATE, payload: true })
     axios({
-      url: `http://localhost:22222/api/todos/${id}`,
+      url: `/api/todos/${id}`,
       method: 'patch'
     })
       .then((response) => {
@@ -67,11 +76,14 @@ export const ToggleTodoStateAction = (id) => {
       })
       .catch((error) => {
         dispatch({
-          type: TaskActions.SET_MESSAGE,
+          type: TaskActions.SET_TASK_MESSAGE,
           payload: error.message
         })
       })
-    dispatch({ type: TaskActions.SET_IS_LOADING_STATE, payload: false })
+      .finally(() => {
+        // set isLoading var in state back to false
+        dispatch({ type: TaskActions.SET_IS_LOADING_STATE, payload: false })
+      })
   }
 }
 
@@ -79,7 +91,7 @@ export const EditTodoAction = (id, body) => {
   return (dispatch) => {
     dispatch({ type: TaskActions.SET_IS_LOADING_STATE, payload: true })
     axios({
-      url: `http://localhost:22222/api/todos/${id}`,
+      url: `/api/todos/${id}`,
       method: 'patch',
       headers: { 'content-type': 'application/x-www-form-urlencoded' },
       data: stringify({ todoBody: body })
@@ -89,11 +101,14 @@ export const EditTodoAction = (id, body) => {
       })
       .catch((error) => {
         dispatch({
-          type: TaskActions.SET_MESSAGE,
+          type: TaskActions.SET_TASK_MESSAGE,
           payload: error.message
         })
       })
-    dispatch({ type: TaskActions.SET_IS_LOADING_STATE, payload: false })
+      .finally(() => {
+        // set isLoading var in state back to false
+        dispatch({ type: TaskActions.SET_IS_LOADING_STATE, payload: false })
+      })
   }
 }
 
@@ -107,7 +122,7 @@ export const DeleteTodoPermanentlyAction = (id) => {
   return (dispatch) => {
     dispatch({ type: TaskActions.SET_IS_LOADING_STATE, payload: true })
     axios({
-      url: `http://localhost:22222/api/todos/${id}`,
+      url: `/api/todos/${id}`,
       method: 'delete'
     })
       .then((response) => {
@@ -115,14 +130,17 @@ export const DeleteTodoPermanentlyAction = (id) => {
       })
       .catch((error) => {
         dispatch({
-          type: TaskActions.SET_MESSAGE,
+          type: TaskActions.SET_TASK_MESSAGE,
           payload: error.message
         })
       })
-    dispatch({ type: TaskActions.SET_IS_LOADING_STATE, payload: false })
+      .finally(() => {
+        // set isLoading var in state back to false
+        dispatch({ type: TaskActions.SET_IS_LOADING_STATE, payload: false })
+      })
   }
 }
 
 export const ClearErrorMessageAction = () => {
-  return { type: TaskActions.SET_MESSAGE, payload: '' }
+  return { type: TaskActions.SET_TASK_MESSAGE, payload: '' }
 }

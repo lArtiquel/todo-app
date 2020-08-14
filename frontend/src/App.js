@@ -1,38 +1,35 @@
 import React from 'react'
 import { ThemeProvider } from '@material-ui/core/styles'
 import { CssBaseline } from '@material-ui/core'
-import { Router, Switch, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Switch } from 'react-router-dom'
 import Theme from './theme'
 import LoginPage from './pages/login'
 import RegisterPage from './pages/register'
 import TaskPage from './pages/task'
-import RouteProtector from './components/RouteProtector'
-import history from './config/history'
+import RouteWithProtection from './components/RouteWithProtection'
 
 const App = () => {
   return (
     <ThemeProvider theme={Theme}>
       <CssBaseline />
-      <Router history={history}>
+      <Router>
         <Switch>
-          <Route path="/login" exact>
-            <RouteProtector routeFor="NOT_AUTHENTICATED">
-              <LoginPage />
-            </RouteProtector>
-          </Route>
-          <Route path="/register" exact>
-            <RouteProtector routeFor="NOT_AUTHENTICATED">
-              <RegisterPage />
-            </RouteProtector>
-          </Route>
+          <RouteWithProtection path="/login" exact routeFor="NOT_AUTHENTICATED">
+            <LoginPage />
+          </RouteWithProtection>
+          <RouteWithProtection
+            path="/register"
+            exact
+            routeFor="NOT_AUTHENTICATED"
+          >
+            <RegisterPage />
+          </RouteWithProtection>
           {/* <Route path="/forgot" exact>
           <ForgotPage />
         </Route> */}
-          <Route path="/" exact>
-            <RouteProtector routeFor="AUTHENTICATED_ONLY">
-              <TaskPage />
-            </RouteProtector>
-          </Route>
+          <RouteWithProtection path="/" exact routeFor="AUTHENTICATED_ONLY">
+            <TaskPage />
+          </RouteWithProtection>
         </Switch>
       </Router>
     </ThemeProvider>

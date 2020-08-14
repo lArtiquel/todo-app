@@ -3,7 +3,7 @@ import { Box, TextField, Typography } from '@material-ui/core'
 import { connect } from 'react-redux'
 import { Formik, Form as FormikForm, Field } from 'formik'
 import * as Yup from 'yup'
-import { Link } from 'react-router-dom'
+import { Link, useHistory } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import CoolButton from './CoolButton'
 import { RegisterAction } from '../store/actions/authActions'
@@ -16,6 +16,7 @@ const INITIAL_FORM_STATE = {
 
 const RegisterForm = ({ register }) => {
   const [form, setForm] = useState(INITIAL_FORM_STATE)
+  const history = useHistory()
 
   const handleFormFieldChange = (e) => {
     setForm({
@@ -37,7 +38,10 @@ const RegisterForm = ({ register }) => {
         }}
         onSubmit={(values, actions) => {
           // try to register
-          register({ email: values.email, password: values.password })
+          register({
+            registerForm: { email: values.email, password: values.password },
+            history
+          })
         }}
         validationSchema={Yup.object().shape({
           email: Yup.string()
@@ -114,7 +118,7 @@ RegisterForm.propTypes = {
 
 const mapActionsToProps = (dispatch) => {
   return {
-    register: (registerForm) => dispatch(RegisterAction(registerForm))
+    register: (props) => dispatch(RegisterAction(props))
   }
 }
 

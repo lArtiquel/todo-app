@@ -1,18 +1,19 @@
 import React from 'react'
 import { ThemeProvider } from '@material-ui/core/styles'
 import { CssBaseline } from '@material-ui/core'
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
+import { Router, Switch, Route } from 'react-router-dom'
 import Theme from './theme'
 import LoginPage from './pages/login'
 import RegisterPage from './pages/register'
 import TaskPage from './pages/task'
 import RouteProtector from './components/RouteProtector'
+import history from './config/history'
 
 const App = () => {
   return (
     <ThemeProvider theme={Theme}>
       <CssBaseline />
-      <Router>
+      <Router history={history}>
         <Switch>
           <Route path="/login" exact>
             <RouteProtector routeFor="NOT_AUTHENTICATED">

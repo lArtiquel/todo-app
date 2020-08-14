@@ -4,7 +4,9 @@ import { connect } from 'react-redux'
 import { Formik, Form as FormikForm, Field } from 'formik'
 import * as Yup from 'yup'
 import { Link } from 'react-router-dom'
+import PropTypes from 'prop-types'
 import CoolButton from './CoolButton'
+import { RegisterAction } from '../store/actions/authActions'
 
 const INITIAL_FORM_STATE = {
   email: '',
@@ -12,7 +14,7 @@ const INITIAL_FORM_STATE = {
   cpassword: ''
 }
 
-export default function RegisterForm() {
+const RegisterForm = ({ register }) => {
   const [form, setForm] = useState(INITIAL_FORM_STATE)
 
   const handleFormFieldChange = (e) => {
@@ -34,8 +36,8 @@ export default function RegisterForm() {
           cpassword: form.cpassword
         }}
         onSubmit={(values, actions) => {
-          // `untouch` form fields
-          // actions.setTouched({ url: false, limit: false, depth: false })
+          // try to register
+          register({ email: values.email, password: values.password })
         }}
         validationSchema={Yup.object().shape({
           email: Yup.string()
@@ -105,3 +107,15 @@ export default function RegisterForm() {
     </Box>
   )
 }
+
+RegisterForm.propTypes = {
+  register: PropTypes.func.isRequired
+}
+
+const mapActionsToProps = (dispatch) => {
+  return {
+    register: (registerForm) => dispatch(RegisterAction(registerForm))
+  }
+}
+
+export default connect(null, mapActionsToProps)(RegisterForm)

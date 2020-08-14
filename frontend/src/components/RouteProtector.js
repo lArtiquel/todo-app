@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { useHistory } from 'react-router-dom'
@@ -20,49 +20,60 @@ const RouteProtector = ({
   closeDialogMessage
 }) => {
   const history = useHistory()
+  const [body, setBody] = useState(null)
 
-  const resolveAuthenticatedOnlyRoute = () => {
+  const resolveAuthenticatedOnlyRouteBody = () => {
     switch (isAuthenticated) {
       case AuthState.AUTHENTICATED:
-        return children
+        setBody(children)
+        break
       case AuthState.NOT_AUTHENTICATED:
-        return history.replace('/login')
+        history.replace('/login')
+        break
       case AuthState.UNDEFINED:
         defineAuthState()
-        return <LoadingScreen />
+        setBody(<LoadingScreen />)
+        break
       default:
-        return <LoadingScreen />
+        setBody(<LoadingScreen />)
     }
   }
 
-  const resolveNotAuthenticatedRoute = () => {
+  const resolveNotAuthenticatedRouteBody = () => {
     switch (isAuthenticated) {
       case AuthState.AUTHENTICATED:
-        return history.replace('/')
+        history.replace('/')
+        break
       case AuthState.NOT_AUTHENTICATED:
-        return children
+        setBody(children)
+        break
       case AuthState.UNDEFINED:
         defineAuthState()
-        return <LoadingScreen />
+        setBody(<LoadingScreen />)
+        break
       default:
-        return <LoadingScreen />
+        setBody(<LoadingScreen />)
     }
   }
 
   const resolveRoute = () => {
     switch (routeFor) {
       case 'AUTHENTICATED_ONLY':
-        return resolveAuthenticatedOnlyRoute()
+        return resolveAuthenticatedOnlyRouteBody()
       case 'NOT_AUTHENTICATED':
-        return resolveNotAuthenticatedRoute()
+        return resolveNotAuthenticatedRouteBody()
       default:
         return children
     }
   }
 
+  useEffect(() => {
+    resolveRoute()
+  }, [routeFor, isAuthenticated])
+
   return (
     <>
-      {resolveRoute()}
+      {body}
       {authDialogMessage && (
         <Dialog
           header="Auth information"

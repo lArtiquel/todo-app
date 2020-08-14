@@ -3,6 +3,7 @@ import { AuthState } from '../../constants/authStates'
 
 const initState = {
   isAuthenticated: AuthState.UNDEFINED,
+  isLoading: false,
   message: '',
   accessToken: ''
 }

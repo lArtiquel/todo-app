@@ -11,6 +11,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -65,10 +66,19 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 
+    /** Configure WebSecurity */
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+        // don't use Spring Security on OPTIONS requests
+        // they are safe, else, for example, you'll get 401 on preflight CORS request
+        web.ignoring().antMatchers(HttpMethod.OPTIONS, "/**");
+    }
+
+    /** Configure HttpSecurity */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .cors().and().csrf().disable()
+                .csrf().disable()
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler)
             .and()
@@ -78,7 +88,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/board/admin").hasRole("ADMIN")
                 .antMatchers("/api/board/user").hasRole("USER")
                 .antMatchers("/api/auth/logout").hasAnyRole("USER", "ADMIN")
-                .antMatchers("/api/auth/**", "/api/board/all").permitAll()
+                .antMatchers("/api/auth/login", "/api/auth/refresh", "/api/auth/register", "/api/board/all").permitAll()
                 .antMatchers("/api/**").hasAnyRole("USER");
     }
 

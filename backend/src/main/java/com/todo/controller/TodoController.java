@@ -1,7 +1,6 @@
 package com.todo.controller;
 
 import com.todo.model.Todo;
-import com.todo.payload.response.RefreshResponse;
 import com.todo.service.TodoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -18,7 +17,7 @@ import java.util.List;
 /**
  * Simple class to test authorization.
  */
-@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600)
 @RestController
 @RequestMapping("/api")
 public class TodoController {

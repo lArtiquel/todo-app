@@ -5,7 +5,7 @@ import axios from '../../config/axios'
 export const LoadTodosAction = () => {
   return (dispatch) => {
     // first of all toggle isLoading var to display loading screen
-    dispatch({ type: TaskActions.SET_IS_LOADING_STATE, payload: true })
+    dispatch({ type: TaskActions.SET_TASK_LOADING_STATE, payload: true })
     // make axios call to fetch all todos from server
     axios({
       url: '/api/todos',
@@ -27,7 +27,7 @@ export const LoadTodosAction = () => {
       })
       .finally(() => {
         // set isLoading var in state back to false
-        dispatch({ type: TaskActions.SET_IS_LOADING_STATE, payload: false })
+        dispatch({ type: TaskActions.SET_TASK_LOADING_STATE, payload: false })
       })
   }
 }
@@ -38,7 +38,7 @@ export const ClearTodosArrayAction = () => {
 
 export const AddTodoAction = (body) => {
   return (dispatch) => {
-    dispatch({ type: TaskActions.SET_IS_LOADING_STATE, payload: true })
+    dispatch({ type: TaskActions.SET_TASK_LOADING_STATE, payload: true })
     // create new todo on server
     axios({
       url: '/api/todos',
@@ -60,14 +60,14 @@ export const AddTodoAction = (body) => {
       })
       .finally(() => {
         // set isLoading var in state back to false
-        dispatch({ type: TaskActions.SET_IS_LOADING_STATE, payload: false })
+        dispatch({ type: TaskActions.SET_TASK_LOADING_STATE, payload: false })
       })
   }
 }
 
 export const ToggleTodoDoneStateAction = (id) => {
   return (dispatch) => {
-    dispatch({ type: TaskActions.SET_IS_LOADING_STATE, payload: true })
+    dispatch({ type: TaskActions.SET_TASK_LOADING_STATE, payload: true })
     axios({
       url: `/api/todos/${id}`,
       method: 'patch'
@@ -83,14 +83,14 @@ export const ToggleTodoDoneStateAction = (id) => {
       })
       .finally(() => {
         // set isLoading var in state back to false
-        dispatch({ type: TaskActions.SET_IS_LOADING_STATE, payload: false })
+        dispatch({ type: TaskActions.SET_TASK_LOADING_STATE, payload: false })
       })
   }
 }
 
 export const EditTodoAction = (id, body) => {
   return (dispatch) => {
-    dispatch({ type: TaskActions.SET_IS_LOADING_STATE, payload: true })
+    dispatch({ type: TaskActions.SET_TASK_LOADING_STATE, payload: true })
     axios({
       url: `/api/todos/${id}`,
       method: 'patch',
@@ -108,7 +108,7 @@ export const EditTodoAction = (id, body) => {
       })
       .finally(() => {
         // set isLoading var in state back to false
-        dispatch({ type: TaskActions.SET_IS_LOADING_STATE, payload: false })
+        dispatch({ type: TaskActions.SET_TASK_LOADING_STATE, payload: false })
       })
   }
 }

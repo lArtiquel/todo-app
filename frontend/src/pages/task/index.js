@@ -36,36 +36,33 @@ const TaskPage = ({
 
   return (
     <>
-      {isLoading ? (
-        <LoadingScreen />
-      ) : (
-        <Container>
-          <Header
-            leftContent={
-              <Typography variant="h4">Welcome, dear user!</Typography>
-            }
-            rightContent={
-              <Button
-                variant="outlined"
-                color="secondary"
-                onClick={() => logout(history)}
-              >
-                Logout
-              </Button>
-            }
+      {isLoading && <LoadingScreen />}
+      <Container>
+        <Header
+          leftContent={
+            <Typography variant="h4">Welcome, dear user!</Typography>
+          }
+          rightContent={
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => logout(history)}
+            >
+              Logout
+            </Button>
+          }
+        />
+        <TodoInput my={3} />
+        <TransitionAlert my={2} content="Task deleted!" />
+        <Tabs my={2} />
+        {todoDialogMessage && (
+          <Dialog
+            header="Todo information"
+            message={todoDialogMessage}
+            closeCallback={closeDialogMessage}
           />
-          <TodoInput my={3} />
-          <TransitionAlert my={2} content="Task deleted!" />
-          <Tabs my={2} />
-          {todoDialogMessage && (
-            <Dialog
-              header="Todo information"
-              message={todoDialogMessage}
-              closeCallback={closeDialogMessage}
-            />
-          )}
-        </Container>
-      )}
+        )}
+      </Container>
     </>
   )
 }

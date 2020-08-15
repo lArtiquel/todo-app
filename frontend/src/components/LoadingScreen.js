@@ -1,27 +1,31 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { makeStyles } from '@material-ui/core/styles'
-import { CircularProgress } from '@material-ui/core'
+import { CircularProgress, Backdrop } from '@material-ui/core'
 
-const useStyles = makeStyles(() => ({
-  background: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '100vw',
-    height: '100vh',
-    top: 0,
-    left: 0,
-    zIndex: 999,
-    backgroundColor: '#4240606e'
+const useStyles = makeStyles((theme) => ({
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1
   }
 }))
 
-export default function LoadingScreen() {
+const LoadingScreen = ({ open, handleClose }) => {
   const styles = useStyles()
 
   return (
-    <div className={styles.background}>
+    <Backdrop
+      className={styles.backdrop}
+      open={open || true}
+      onClick={handleClose}
+    >
       <CircularProgress />
-    </div>
+    </Backdrop>
   )
 }
+
+LoadingScreen.propTypes = {
+  open: PropTypes.bool,
+  handleClose: PropTypes.func
+}
+
+export default LoadingScreen

@@ -92,7 +92,7 @@ const Tabs = ({ my, todos }) => {
         <TabPanel value={value} index={1} dir={theme.direction}>
           {value === 1 &&
             todos
-              .filter((todo) => todo.isDone === false)
+              .filter((todo) => todo.done === false)
               .map((todo) => (
                 <Todo
                   key={todo.id}
@@ -105,7 +105,7 @@ const Tabs = ({ my, todos }) => {
         <TabPanel value={value} index={2} dir={theme.direction}>
           {value === 2 &&
             todos
-              .filter((todo) => todo.isDone === true)
+              .filter((todo) => todo.done === true)
               .map((todo) => (
                 <Todo
                   key={todo.id}

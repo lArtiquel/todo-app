@@ -42,6 +42,7 @@ export const DefineAuthStateAction = () => {
 
 export const LoginAction = (loginForm) => {
   return (dispatch) => {
+    dispatch({ type: AuthActions.SET_AUTH_LOADING_STATE, payload: true })
     axios({
       url: '/api/auth/login',
       method: 'post',
@@ -66,6 +67,9 @@ export const LoginAction = (loginForm) => {
           type: AuthActions.SET_AUTH_MESSAGE,
           payload: 'Failed to login.'
         })
+      })
+      .finally(() => {
+        dispatch({ type: AuthActions.SET_AUTH_LOADING_STATE, payload: false })
       })
   }
 }
@@ -96,6 +100,7 @@ export const LogoutAction = (history) => {
 
 export const RegisterAction = ({ registerForm, history }) => {
   return (dispatch) => {
+    dispatch({ type: AuthActions.SET_AUTH_LOADING_STATE, payload: true })
     axios({
       url: '/api/auth/register',
       method: 'post',
@@ -116,6 +121,9 @@ export const RegisterAction = ({ registerForm, history }) => {
           type: AuthActions.SET_AUTH_MESSAGE,
           payload: error.message // sets some strange message
         })
+      })
+      .finally(() => {
+        dispatch({ type: AuthActions.SET_AUTH_LOADING_STATE, payload: false })
       })
   }
 }

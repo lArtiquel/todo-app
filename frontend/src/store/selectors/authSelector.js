@@ -11,3 +11,7 @@ export const getAuthAccessToken = () => {
 export const getAuthMessage = () => {
   return store.getState().auth.message
 }
+
+export const getLoadingState = () => {
+  return store.getState().auth.isLoading
+}

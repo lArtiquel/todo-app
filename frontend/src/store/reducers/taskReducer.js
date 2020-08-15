@@ -97,7 +97,7 @@ export default function TaskReducer(state = initState, action) {
       }
     }
 
-    case TaskActions.SET_IS_LOADING_STATE: {
+    case TaskActions.SET_TASK_LOADING_STATE: {
       return {
         ...state,
         isLoading: action.payload

@@ -1,5 +1,4 @@
 import React from 'react'
-import { Typography } from '@material-ui/core'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { getLoadingState } from '../../store/selectors/authSelector'
@@ -8,19 +7,14 @@ import CenteredFlexContainer from '../../components/CenteredFlexContainer'
 import Header from '../../components/Header'
 import RegisterForm from '../../components/RegisterForm'
 import LoadingScreen from '../../components/LoadingScreen'
+import Logo from '../../components/Logo'
 
 const RegisterPage = ({ isLoading }) => {
   return (
     <>
       {isLoading && <LoadingScreen />}
       <Container>
-        <Header
-          leftContent={
-            <Typography variant="h4" align="center">
-              Welcome to Arti's TODO app
-            </Typography>
-          }
-        />
+        <Header leftContent={<Logo align="center" />} />
         <CenteredFlexContainer>
           <RegisterForm />
         </CenteredFlexContainer>

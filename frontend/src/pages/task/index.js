@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { Typography, Button } from '@material-ui/core'
+import { Button } from '@material-ui/core'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { useHistory } from 'react-router-dom'
@@ -17,6 +17,7 @@ import {
 } from '../../store/actions/taskActions'
 import { LogoutAction } from '../../store/actions/authActions'
 import Dialog from '../../components/KeepInTouchDialog'
+import Logo from '../../components/Logo'
 
 const TaskPage = ({
   loadTodos,
@@ -39,9 +40,7 @@ const TaskPage = ({
       {isLoading && <LoadingScreen />}
       <Container>
         <Header
-          leftContent={
-            <Typography variant="h4">Welcome, dear user!</Typography>
-          }
+          leftContent={<Logo />}
           rightContent={
             <Button
               variant="outlined"

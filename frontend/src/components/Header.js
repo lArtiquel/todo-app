@@ -4,14 +4,19 @@ import PropTypes from 'prop-types'
 
 const Header = ({ leftContent, rightContent }) => {
   return (
-    <Box display="flex" my={2} boxShadow={8}>
+    <Box display="flex" mb={2} boxShadow={8}>
       {leftContent && (
-        <Box flexGrow={100} m={2}>
+        <Box display="flex" flexDirection="row" flexGrow={1}>
           {leftContent}
         </Box>
       )}
       {rightContent && (
-        <Box flexGrow={1} m={2}>
+        <Box
+          display="flex"
+          flexDirection="column"
+          justifyContent="center"
+          maxWidth={120}
+        >
           {rightContent}
         </Box>
       )}

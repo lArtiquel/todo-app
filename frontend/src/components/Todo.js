@@ -8,7 +8,7 @@ import CloseRoundedIcon from '@material-ui/icons/CloseRounded'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import {
-  ToggleTodoStateAction,
+  ToggleTodoDoneStateAction,
   EditTodoAction,
   ToggleTodoToBeDeletedStateAction
 } from '../store/actions/taskActions'
@@ -31,51 +31,52 @@ const useStyles = makeStyles((theme) => ({
 
 const Todo = ({
   id,
-  isDone,
-  todoBody,
+  body,
+  done,
   toggleTodoState,
   editTodo,
   toggleTodoToBeDeletedState
 }) => {
   const styles = useStyles()
   const [isEditing, setEditing] = useState(false)
-  const [newTodoBody, setNewTodoBody] = useState(todoBody)
+  const [newBody, setNewBody] = useState(body)
   const todoRef = useRef()
 
   const closeEdit = () => {
     setEditing(false)
-    setNewTodoBody(todoBody)
+    setNewBody(body)
   }
 
   const handleEditTodoChange = (e) => {
-    setNewTodoBody(e.target.value)
+    setNewBody(e.target.value)
   }
 
   const handleEditTodoButtonClick = () => {
-    editTodo(id, newTodoBody)
+    editTodo(id, newBody)
     setEditing(false)
   }
 
   const editTodoEnterKeyCallback = useCallback(
     (e) => {
       if (e.key === 'Enter' || e.keyCode === 13) {
-        editTodo(id, newTodoBody)
+        editTodo(id, newBody)
         setEditing(false)
         e.stopPropagation()
       }
     },
-    [newTodoBody]
+    [id, newBody, editTodo]
   )
 
   useEffect(() => {
-    if (isEditing && todoRef.current)
-      todoRef.current.addEventListener('keyup', editTodoEnterKeyCallback)
+    const currentRef = todoRef.current
+    if (isEditing && currentRef)
+      currentRef.addEventListener('keyup', editTodoEnterKeyCallback)
 
     return () => {
-      if (isEditing && todoRef.current)
-        todoRef.current.removeEventListener('keyup', editTodoEnterKeyCallback)
+      if (isEditing && currentRef)
+        currentRef.removeEventListener('keyup', editTodoEnterKeyCallback)
     }
-  }, [todoRef.current, isEditing, editTodoEnterKeyCallback])
+  }, [todoRef, isEditing, editTodoEnterKeyCallback])
 
   return (
     <Box display="flex" ref={todoRef}>
@@ -85,7 +86,7 @@ const Todo = ({
             variant="outlined"
             margin="dense"
             fullWidth
-            value={newTodoBody}
+            value={newBody}
             onChange={handleEditTodoChange}
           />
           <IconButton
@@ -114,10 +115,10 @@ const Todo = ({
           </IconButton>
           <Box width="100%" my={2}>
             <Typography
-              className={isDone ? styles.crossedTextDecoration : ''}
+              className={done ? styles.crossedTextDecoration : ''}
               variant="body1"
             >
-              {todoBody}
+              {body}
             </Typography>
           </Box>
           <IconButton
@@ -142,8 +143,8 @@ const Todo = ({
 
 Todo.propTypes = {
   id: PropTypes.string.isRequired,
-  isDone: PropTypes.bool.isRequired,
-  todoBody: PropTypes.string.isRequired,
+  body: PropTypes.string.isRequired,
+  done: PropTypes.bool.isRequired,
   toggleTodoState: PropTypes.func.isRequired,
   editTodo: PropTypes.func.isRequired,
   toggleTodoToBeDeletedState: PropTypes.func.isRequired
@@ -151,11 +152,10 @@ Todo.propTypes = {
 
 const mapActionsToProps = (dispatch) => {
   return {
-    toggleTodoState: (id) => dispatch(ToggleTodoStateAction(id)),
-    editTodo: (id, newTodoContent) =>
-      dispatch(EditTodoAction(id, newTodoContent)),
-    toggleTodoToBeDeletedState: (todoId) =>
-      dispatch(ToggleTodoToBeDeletedStateAction(todoId))
+    toggleTodoState: (id) => dispatch(ToggleTodoDoneStateAction(id)),
+    editTodo: (id, newBody) => dispatch(EditTodoAction(id, newBody)),
+    toggleTodoToBeDeletedState: (id) =>
+      dispatch(ToggleTodoToBeDeletedStateAction(id))
   }
 }
 

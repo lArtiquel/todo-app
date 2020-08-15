@@ -74,8 +74,7 @@ export const LogoutAction = (history) => {
   return (dispatch) => {
     axios({
       url: '/api/auth/logout',
-      method: 'post',
-      skipAuthRefresh: true // don't refresh token if we get 401 error
+      method: 'post'
     }).finally((response) => {
       // remove access token on client
       dispatch({

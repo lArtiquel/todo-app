@@ -32,7 +32,7 @@ const TaskPage = ({
     loadTodos()
 
     return () => clearTodos()
-  }, []) // load todos once page component mounted and clear todos array when unmounted
+  }, [loadTodos, clearTodos]) // load todos once page component mounted and clear todos array when unmounted
 
   return (
     <>

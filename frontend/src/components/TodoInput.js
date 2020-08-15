@@ -32,18 +32,19 @@ const TodoInput = ({ my, addTodo }) => {
         e.stopPropagation()
       }
     },
-    [todo]
+    [addTodo, todo]
   )
 
   useEffect(() => {
-    if (inputRef.current)
-      inputRef.current.addEventListener('keyup', addTodoEnterKeyCallback)
+    const currentRef = inputRef.current
+    if (currentRef)
+      currentRef.addEventListener('keyup', addTodoEnterKeyCallback)
 
     return () => {
-      if (inputRef.current)
-        inputRef.current.removeEventListener('keyup', addTodoEnterKeyCallback)
+      if (currentRef)
+        currentRef.removeEventListener('keyup', addTodoEnterKeyCallback)
     }
-  }, [inputRef.current, addTodoEnterKeyCallback])
+  }, [inputRef, addTodoEnterKeyCallback])
 
   return (
     <Box my={my} display="flex">

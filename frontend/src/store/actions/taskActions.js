@@ -22,7 +22,7 @@ export const LoadTodosAction = () => {
         // set request error
         dispatch({
           type: TaskActions.SET_TASK_MESSAGE,
-          payload: error.message
+          payload: 'Failed to load todos.'
         })
       })
       .finally(() => {
@@ -39,11 +39,12 @@ export const ClearTodosArrayAction = () => {
 export const AddTodoAction = (body) => {
   return (dispatch) => {
     dispatch({ type: TaskActions.SET_IS_LOADING_STATE, payload: true })
-    // add todo on server
+    // create new todo on server
     axios({
       url: '/api/todos',
       method: 'post',
-      data: { todoBody: body }
+      headers: { 'content-type': 'application/x-www-form-urlencoded' },
+      data: stringify({ todoBody: body })
     })
       .then((response) => {
         dispatch({
@@ -54,7 +55,7 @@ export const AddTodoAction = (body) => {
       .catch((error) => {
         dispatch({
           type: TaskActions.SET_TASK_MESSAGE,
-          payload: error.message
+          payload: 'Failed to create new todo on server.'
         })
       })
       .finally(() => {
@@ -64,7 +65,7 @@ export const AddTodoAction = (body) => {
   }
 }
 
-export const ToggleTodoStateAction = (id) => {
+export const ToggleTodoDoneStateAction = (id) => {
   return (dispatch) => {
     dispatch({ type: TaskActions.SET_IS_LOADING_STATE, payload: true })
     axios({
@@ -72,12 +73,12 @@ export const ToggleTodoStateAction = (id) => {
       method: 'patch'
     })
       .then((response) => {
-        dispatch({ type: TaskActions.TOGGLE_TODO_STATE, payload: id })
+        dispatch({ type: TaskActions.TOGGLE_TODO_DONE_STATE, payload: id })
       })
       .catch((error) => {
         dispatch({
           type: TaskActions.SET_TASK_MESSAGE,
-          payload: error.message
+          payload: 'Failed to complete todo on server.'
         })
       })
       .finally(() => {
@@ -102,7 +103,7 @@ export const EditTodoAction = (id, body) => {
       .catch((error) => {
         dispatch({
           type: TaskActions.SET_TASK_MESSAGE,
-          payload: error.message
+          payload: 'Failed to edit todo on server.'
         })
       })
       .finally(() => {
@@ -113,14 +114,11 @@ export const EditTodoAction = (id, body) => {
 }
 
 export const ToggleTodoToBeDeletedStateAction = (id) => {
-  return (dispatch) => {
-    dispatch({ type: TaskActions.TOGGLE_TODO_TO_BE_DELETED_STATE, payload: id })
-  }
+  return { type: TaskActions.TOGGLE_TODO_TO_BE_DELETED_STATE, payload: id }
 }
 
 export const DeleteTodoPermanentlyAction = (id) => {
   return (dispatch) => {
-    dispatch({ type: TaskActions.SET_IS_LOADING_STATE, payload: true })
     axios({
       url: `/api/todos/${id}`,
       method: 'delete'
@@ -131,12 +129,13 @@ export const DeleteTodoPermanentlyAction = (id) => {
       .catch((error) => {
         dispatch({
           type: TaskActions.SET_TASK_MESSAGE,
-          payload: error.message
+          payload: 'Failed to delete todo on server.'
         })
-      })
-      .finally(() => {
-        // set isLoading var in state back to false
-        dispatch({ type: TaskActions.SET_IS_LOADING_STATE, payload: false })
+        // return back todo from `to be deleted state`
+        dispatch({
+          type: TaskActions.TOGGLE_TODO_TO_BE_DELETED_STATE,
+          payload: id
+        })
       })
   }
 }

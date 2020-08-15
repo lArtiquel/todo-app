@@ -4,38 +4,7 @@ const initState = {
   isLoading: false,
   message: '',
   lastDeletedTodoId: '',
-  todos: [
-    // {
-    //   id: 'FirstID',
-    //   isDone: true,
-    //   body: 'First todo',
-    //   isMarkedToBeDeleted: false
-    // },
-    // {
-    //   id: 'SecondID',
-    //   isDone: false,
-    //   body: 'Second todo',
-    //   isMarkedToBeDeleted: false
-    // },
-    // {
-    //   id: 'ThirdID',
-    //   isDone: false,
-    //   body: 'Third todo',
-    //   isMarkedToBeDeleted: false
-    // },
-    // {
-    //   id: '4',
-    //   isDone: true,
-    //   body: 'Clean floor.',
-    //   isMarkedToBeDeleted: false
-    // },
-    // {
-    //   id: '5',
-    //   isDone: true,
-    //   body: 'Wash dishes.',
-    //   isMarkedToBeDeleted: false
-    // }
-  ]
+  todos: []
 }
 
 export default function TaskReducer(state = initState, action) {
@@ -67,7 +36,7 @@ export default function TaskReducer(state = initState, action) {
       }
     }
 
-    case TaskActions.TOGGLE_TODO_STATE: {
+    case TaskActions.TOGGLE_TODO_DONE_STATE: {
       return {
         ...state,
         todos: [
@@ -75,7 +44,7 @@ export default function TaskReducer(state = initState, action) {
             if (todo.id === action.payload)
               return {
                 ...todo,
-                isDone: !todo.isDone
+                done: !todo.done
               }
             return todo
           })

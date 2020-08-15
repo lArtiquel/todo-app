@@ -23,7 +23,7 @@ const RouteWithProtection = ({
   const [body, setBody] = useState(null)
   const history = useHistory()
 
-  const resolveAuthenticatedOnlyRouteBody = () => {
+  const resolveAuthenticatedOnlyRouteBody = useCallback(() => {
     switch (isAuthenticated) {
       case AuthState.AUTHENTICATED:
         return children
@@ -36,9 +36,9 @@ const RouteWithProtection = ({
       default:
         return <LoadingScreen />
     }
-  }
+  }, [children, defineAuthState, history, isAuthenticated])
 
-  const resolveNotAuthenticatedRouteBody = () => {
+  const resolveNotAuthenticatedRouteBody = useCallback(() => {
     switch (isAuthenticated) {
       case AuthState.AUTHENTICATED:
         history.replace('/')
@@ -51,7 +51,7 @@ const RouteWithProtection = ({
       default:
         return <LoadingScreen />
     }
-  }
+  }, [children, defineAuthState, history, isAuthenticated])
 
   const resolveRoute = useCallback(() => {
     switch (routeFor) {
@@ -62,7 +62,12 @@ const RouteWithProtection = ({
       default:
         return setBody(children)
     }
-  }, [routeFor, isAuthenticated])
+  }, [
+    routeFor,
+    resolveAuthenticatedOnlyRouteBody,
+    resolveNotAuthenticatedRouteBody,
+    children
+  ])
 
   useEffect(() => {
     resolveRoute()

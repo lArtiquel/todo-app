@@ -83,8 +83,8 @@ const Tabs = ({ my, todos }) => {
                 <Todo
                   key={todo.id}
                   id={todo.id}
-                  isDone={todo.isDone}
-                  todoBody={todo.body}
+                  body={todo.body}
+                  done={todo.done}
                 />
               )
             })}
@@ -97,8 +97,8 @@ const Tabs = ({ my, todos }) => {
                 <Todo
                   key={todo.id}
                   id={todo.id}
-                  isDone={todo.isDone}
-                  todoBody={todo.body}
+                  body={todo.body}
+                  done={todo.done}
                 />
               ))}
         </TabPanel>
@@ -110,8 +110,8 @@ const Tabs = ({ my, todos }) => {
                 <Todo
                   key={todo.id}
                   id={todo.id}
-                  isDone={todo.isDone}
-                  todoBody={todo.body}
+                  body={todo.body}
+                  done={todo.done}
                 />
               ))}
         </TabPanel>

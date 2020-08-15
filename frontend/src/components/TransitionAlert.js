@@ -38,7 +38,7 @@ const TransitionAlert = ({
     } else {
       setOpen(false)
     }
-  }, [lastDeletedTodoId])
+  }, [deletePermanently, lastDeletedTodoId])
 
   return (
     <Box my={my}>

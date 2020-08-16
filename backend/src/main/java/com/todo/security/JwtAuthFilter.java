@@ -1,30 +1,23 @@
 package com.todo.security;
 
-import java.io.IOException;
-
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import com.todo.service.AuthService;
 import com.todo.service.UserDetailsServiceImpl;
-import io.jsonwebtoken.ExpiredJwtException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * Filter is intended to be used before Security to fetch and parse JWT access token.
@@ -36,6 +29,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     @Value("${app.config.jwt.access.header}")
     private String accessJwtHeaderName;
+
+    @Value("${app.config.permitAllEndpoints}")
+    private List<String> permitAllEndpoints;
 
     private JwtValidator jwtValidator;
     private JwtProvider jwtProvider;
@@ -51,33 +47,39 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     }
 
     @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        // this step is not necessary and sometimes it's faster to check jwt in all requests
+        // should not be filtered requests in `permitAllEndpoints` list and `OPTIONS` requests
+        return permitAllEndpoints.contains(request.getRequestURI()) || request.getMethod().equals("OPTIONS");
+    }
+
+    @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-            // get jwt access token from req header
-            final String jwt = jwtParser.getJwtFromHeader(request, accessJwtHeaderName);
+        // get jwt access token from req header
+        final String jwt = jwtParser.getJwtFromHeader(request, accessJwtHeaderName);
 
-            // validate jwt access token
-            if (jwt != null && jwtValidator.validateAccessJwt(jwt)) {
-                // get userId from jwt token
-                final String id = jwtProvider.getUserIdFromAccessJwt(jwt);
-                // get user details
-                final UserDetails userDetails = userDetailsService.loadUserById(id);
-                try {
-                    // create authentication token
-                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails,
-                                                                                                                null,
-                                                                                                                userDetails.getAuthorities());
-                    // set authentication details
-                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    // set user's authentication in Security context
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                } catch (Exception e) {
-                    // in case of failure make sure it's clear; so guarantee user won't be authenticated
-                    SecurityContextHolder.clearContext();
-                    logger.error("Cannot set user authentication: {}", e.getMessage());
-                }
+        // validate jwt access token
+        if (jwt != null && jwtValidator.validateAccessJwt(jwt)) {
+            // get userId from jwt token
+            final String id = jwtProvider.getUserIdFromAccessJwt(jwt);
+            // get user details
+            final UserDetails userDetails = userDetailsService.loadUserById(id);
+            try {
+                // create authentication token
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails,
+                        null,
+                        userDetails.getAuthorities());
+                // set authentication details
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                // set user's authentication in Security context
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            } catch (Exception e) {
+                // in case of failure make sure it's clear; so guarantee user won't be authenticated
+                SecurityContextHolder.clearContext();
+                logger.error("Cannot set user authentication: {}", e.getMessage());
             }
-
+        }
 
         filterChain.doFilter(request, response);
     }

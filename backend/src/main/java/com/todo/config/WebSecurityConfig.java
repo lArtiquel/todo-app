@@ -4,6 +4,7 @@ import com.todo.security.JwtAuthFailureHandler;
 import com.todo.security.JwtAuthFilter;
 import com.todo.service.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -18,6 +19,14 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Spring Security Configuration class extends {@code WebSecurityConfigurerAdapter}
@@ -36,6 +45,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private JwtAuthFailureHandler unauthorizedHandler;
     /** Jwt authentication filter */
     private JwtAuthFilter jwtAuthFilter;
+
+    @Value("${app.config.permitAllEndpoints}")
+    private String[] permitAllEndpoints;
 
     @Autowired
     public WebSecurityConfig(UserDetailsServiceImpl userDetailsService, JwtAuthFailureHandler unauthorizedHandler, JwtAuthFilter jwtAuthFilter) {
@@ -66,30 +78,40 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 
-    /** Configure WebSecurity */
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        // don't use Spring Security on OPTIONS requests
-        // they are safe, else, for example, you'll get 401 on preflight CORS request
-        web.ignoring().antMatchers(HttpMethod.OPTIONS, "/**");
+    /** Configure and create CORS filter bean. */
+    @Bean
+    public CorsFilter corsFilter() {
+        final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        final CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(false);
+        config.setAllowedOrigins(Arrays.asList("https://tododo-app.netlify.app", "http://localhost:3000"));
+        config.setAllowedHeaders(Arrays.asList("*")); // allow all headers
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        source.registerCorsConfiguration("/**", config);
+        return new CorsFilter(source);
     }
+
+//    /** Configure WebSecurity */
+//    @Override
+//    public void configure(WebSecurity web) throws Exception {
+//        // any static resources here
+//        web.ignoring().antMatchers(HttpMethod.GET, "/**");
+//    }
 
     /** Configure HttpSecurity */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
+                .addFilterBefore(corsFilter(), CorsFilter.class)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler)
             .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
                 .authorizeRequests()
-                .antMatchers("/api/board/admin").hasRole("ADMIN")
-                .antMatchers("/api/board/user").hasRole("USER")
-                .antMatchers("/api/auth/logout").hasAnyRole("USER", "ADMIN")
-                .antMatchers("/api/auth/login", "/api/auth/refresh", "/api/auth/register", "/api/board/all").permitAll()
-                .antMatchers("/api/**").hasAnyRole("USER");
+                .antMatchers(permitAllEndpoints).permitAll()
+                .antMatchers("/api/**").hasAnyRole("USER", "ADMIN");
     }
 
 }

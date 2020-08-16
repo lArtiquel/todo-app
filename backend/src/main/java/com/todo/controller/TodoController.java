@@ -17,7 +17,6 @@ import java.util.List;
 /**
  * Simple class to test authorization.
  */
-@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600)
 @RestController
 @RequestMapping("/api")
 public class TodoController {

@@ -30,9 +30,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Value("${app.config.jwt.access.header}")
     private String accessJwtHeaderName;
 
-    @Value("${app.config.permitAllEndpoints}")
-    private List<String> permitAllEndpoints;
-
     private JwtValidator jwtValidator;
     private JwtProvider jwtProvider;
     private UserDetailsServiceImpl userDetailsService;
@@ -44,13 +41,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         this.jwtProvider = jwtProvider;
         this.userDetailsService = userDetailsService;
         this.jwtParser = jwtParser;
-    }
-
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        // this step is not necessary and sometimes it's faster to check jwt in all requests
-        // should not be filtered requests in `permitAllEndpoints` list and `OPTIONS` requests
-        return permitAllEndpoints.contains(request.getRequestURI()) || request.getMethod().equals("OPTIONS");
     }
 
     @Override

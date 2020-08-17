@@ -24,14 +24,9 @@ public class JwtAuthFailureHandler implements AuthenticationEntryPoint {
 	@Override
 	public void commence(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException authException) throws IOException, ServletException {
-		if(request.getMethod().equals("OPTIONS")) {
-			// send OK status on all OPTIONS requests
-			response.setStatus(HttpServletResponse.SC_OK);
-		} else {
-			logger.error("Unauthorized error: {}", authException.getMessage());
-			// just send a 401 Unauthorized response because there is no 'login page' to redirect to
-			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Prevented from accessing protected route without supplying any credentials!");
-		}
+		logger.error("Unauthorized error: {}", authException.getMessage());
+		// just send a 401 Unauthorized response because there is no 'login page' to redirect to
+		response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Prevented from accessing protected route without supplying any credentials!");
 	}
 
 }

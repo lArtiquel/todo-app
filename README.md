@@ -1,0 +1,1 @@
+[![Netlify Deploy Status](https://api.netlify.com/api/v1/badges/6951ac70-8528-49c5-b968-2484ee405bce/deploy-status)](https://app.netlify.com/sites/tododo-app/deploys)

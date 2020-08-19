@@ -30,6 +30,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Value("${app.config.jwt.access.header}")
     private String accessJwtHeaderName;
 
+    @Value("${app.config.permitAllRoutes}")
+    private List<String> permitAllRoutes;
+
     private JwtValidator jwtValidator;
     private JwtProvider jwtProvider;
     private UserDetailsServiceImpl userDetailsService;
@@ -41,6 +44,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         this.jwtProvider = jwtProvider;
         this.userDetailsService = userDetailsService;
         this.jwtParser = jwtParser;
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        // this action needed not to filter requests with `permitAllRoutes` URI only
+        // it won't cause any issue if u delete it cause this routes are already configured as `permitAll` in Security
+        return permitAllRoutes.contains(request.getRequestURI());
     }
 
     @Override

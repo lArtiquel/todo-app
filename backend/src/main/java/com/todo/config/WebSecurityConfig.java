@@ -4,6 +4,7 @@ import com.todo.security.JwtAuthFailureHandler;
 import com.todo.security.JwtAuthFilter;
 import com.todo.service.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -33,6 +34,9 @@ import java.util.Arrays;
         // jsr250Enabled = true,
         prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Value("${app.config.permitAllRoutes}")
+    private String[] permitAllRoutes;
 
     /** Service used to fetch UserDetails */
     private UserDetailsServiceImpl userDetailsService;
@@ -89,7 +93,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
                 .authorizeRequests()
-                .antMatchers("/api/auth/login", "/api/auth/refresh", "/api/auth/register").permitAll()
+                .antMatchers(permitAllRoutes).permitAll()
                 .antMatchers("/api/**").hasAnyRole("USER", "ADMIN");
     }
 

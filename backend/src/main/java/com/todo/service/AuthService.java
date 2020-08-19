@@ -9,6 +9,7 @@ import com.todo.repository.UserRepository;
 import com.todo.security.JwtProvider;
 import com.todo.security.JwtValidator;
 import com.todo.security.UserDetailsImpl;
+import org.apache.tomcat.util.http.SameSiteCookies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -32,9 +33,6 @@ import java.util.stream.Collectors;
 /** Authentication service. */
 @Service
 public class AuthService {
-
-    @Value("${app.config.jwt.refresh.cookie}")
-    private String refreshJwtCookieName;
 
     private AuthenticationManager authenticationManager;
     private UserRepository userRepository;
@@ -86,25 +84,6 @@ public class AuthService {
     /** Generates refresh token. */
     public RefreshToken generateRefreshToken(String userId) {
         return jwtProvider.generateRefreshJwt(userId);
-    }
-
-    /** Creates refresh token cookie. */
-    public Cookie createRefreshTokenCookie(RefreshToken refreshToken) {
-        // create a cookie
-        final Cookie cookie = new Cookie(refreshJwtCookieName, refreshToken.getToken());
-
-        // set expiration time, secure, httpOnly and path attributes
-        cookie.setMaxAge(jwtProvider.getRefreshJwtMaxAgeInSec());
-        cookie.setSecure(false); // TODO: Change back to secure in production (localhost is not https)
-        cookie.setHttpOnly(true);
-        cookie.setPath("/api/auth");
-
-        return cookie;
-    }
-
-    /** Creates cookie in response .*/
-    public void addCookieToTheResponse(HttpServletResponse response, Cookie cookie) {
-        response.addCookie(cookie);
     }
 
     /** Returns set of user's granted authorities. */

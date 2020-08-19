@@ -33,9 +33,6 @@ import java.util.Set;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    @Value("${app.config.jwt.refresh.cookie}")
-    private String refreshJwtCookieName;
-
     private AuthService authService;
     private ApplicationEventPublisher applicationEventPublisher;
 
@@ -57,21 +54,19 @@ public class AuthController {
     @Operation(summary = "Login user.")
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "200", description = "User logged in successfully. Provided below is payload schema.",
+                    responseCode = "200", description = "User logged in successfully.",
                     content = { @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = LoginResponse.class)) }),
+                            schema = @Schema(implementation = LoginResponse.class))}),
             @ApiResponse(
                     responseCode = "401", description = "Wrong credentials provided.",
                     content = @Content)})
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest, HttpServletResponse response) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest) {
         // authenticate user
         final UserDetailsImpl userDetails = authService.authenticateUser(loginRequest);
         // issue new access and refresh tokens
         final AccessToken accessToken = authService.generateAccessToken(userDetails.getId());
         final RefreshToken refreshToken = authService.generateRefreshToken(userDetails.getId());
-        // add cookie to the response
-        authService.addCookieToTheResponse(response, authService.createRefreshTokenCookie(refreshToken));
         // get user authorities
         Set<String> setOfAuthorities = authService.getSetOfAuthorities(userDetails);
         // publish login event
@@ -101,21 +96,18 @@ public class AuthController {
             @ApiResponse(
                     responseCode = "401", description = "Invalid token.",
                     content = @Content)})
-    @PostMapping("/refresh")
-    public ResponseEntity<?> refresh(@CookieValue(name="RefreshToken") String refreshJwt, // Don't forget to change annotation name if u changed it in app.props
-                                     HttpServletResponse response) {
+    @PostMapping(value="/refresh", params = "token")
+    public ResponseEntity<?> refresh(@RequestParam String token) {
         // validate provided refresh token and fetch its model
-        final RefreshToken oldRefreshToken = authService.validateRefreshTokenAndFetchItsModel(refreshJwt);
-        // generate new tokens
-        final AccessToken newAccessToken = authService.generateAccessToken(oldRefreshToken.getUserId());
-        final RefreshToken updatedRefreshToken = authService.updateRefreshToken(oldRefreshToken);
-        // add refresh token cookie
-        authService.addCookieToTheResponse(response, authService.createRefreshTokenCookie(updatedRefreshToken));
+        RefreshToken refreshTokenModel = authService.validateRefreshTokenAndFetchItsModel(token);
+        // generate new access token and update refresh token
+        AccessToken accessTokenModel = authService.generateAccessToken(refreshTokenModel.getUserId());
+        refreshTokenModel = authService.updateRefreshToken(refreshTokenModel);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new RefreshResponse(newAccessToken.getToken(),
-                                updatedRefreshToken.getToken()));
+                .body(new RefreshResponse(accessTokenModel.getToken(),
+                        refreshTokenModel.getToken()));
     }
 
     /**
@@ -124,7 +116,7 @@ public class AuthController {
     @Operation(summary = "Register user.")
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "200", description = "User registered successfully.",
+                    responseCode = "200", description = "Registered successfully.",
                     content = { @Content(mediaType = "application/json",
                             schema = @Schema(implementation = PlainMessageResponse.class)) }),
             @ApiResponse(
@@ -136,9 +128,10 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest registerRequest) {
         authService.register(registerRequest);
+
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new PlainMessageResponse("User registered successfully!"));
+                .body(new PlainMessageResponse("Registered successfully! Now try to login."));
     }
 
     /**
@@ -150,22 +143,22 @@ public class AuthController {
     @Operation(summary = "Logout user.")
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "200", description = "User logged out successfully.",
+                    responseCode = "200", description = "Logged out successfully.",
                     content = { @Content(mediaType = "application/json",
                             schema = @Schema(implementation = PlainMessageResponse.class)) }),
             @ApiResponse(
                     responseCode = "401", description = "Refresh token failed validation.",
                     content = @Content)})
-    @PostMapping("/logout")
-    public ResponseEntity<?> logout(
-            @CookieValue(name="RefreshToken") String refreshJwt) { // Don't forget to change annotation name if u changed it in app.props
+    @PostMapping(value = "/logout", params = "token")
+    public ResponseEntity<?> logout(@RequestParam String token) {
         // validate refresh token
-        final RefreshToken refreshToken = authService.validateRefreshTokenAndFetchItsModel(refreshJwt);
+        final RefreshToken refreshToken = authService.validateRefreshTokenAndFetchItsModel(token);
         // withdraw refresh token
         authService.withdrawRefreshToken(refreshToken);
+
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new PlainMessageResponse("User logged out successfully!"));
+                .body(new PlainMessageResponse("Logged out successfully!"));
     }
 
 }

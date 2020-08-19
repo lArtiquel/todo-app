@@ -18,7 +18,7 @@ public class AppConfig {
                         .allowedOrigins("http://localhost:3000", "http://192.168.8.100:3000", "https://tododo-app.netlify.app")
                         .allowedMethods("*")
                         .allowedHeaders("*")
-                        .allowCredentials(true).maxAge(3600);
+                        .allowCredentials(false).maxAge(3600);
             }
         };
     }

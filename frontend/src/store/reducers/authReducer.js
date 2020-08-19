@@ -20,7 +20,7 @@ export default function AuthReducer(state = initState, action) {
     case AuthActions.SET_NEW_ACCESS_TOKEN: {
       return {
         ...state,
-        accessToken: action.payload.accessToken
+        accessToken: action.payload
       }
     }
 

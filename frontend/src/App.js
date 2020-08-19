@@ -27,7 +27,7 @@ const App = () => {
           {/* <Route path="/forgot" exact>
           <ForgotPage />
         </Route> */}
-          <RouteWithProtection path="/" exact routeFor="AUTHENTICATED_ONLY">
+          <RouteWithProtection path="/" routeFor="AUTHENTICATED_ONLY">
             <TaskPage />
           </RouteWithProtection>
         </Switch>

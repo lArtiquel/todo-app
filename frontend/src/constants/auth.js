@@ -5,6 +5,4 @@ export const AuthActions = {
   SET_AUTH_MESSAGE: 'SET_AUTH_MESSAGE'
 }
 
-export const AuthNoteName = 'wasIAuthenticated'
-
 export default AuthActions

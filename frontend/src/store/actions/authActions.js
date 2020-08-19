@@ -1,35 +1,52 @@
-import { AuthActions, AuthNoteName } from '../../constants/auth'
+import stringify from 'qs-stringify'
+import { AuthActions } from '../../constants/auth'
 import { AuthState } from '../../constants/authStates'
 import axios from '../../config/axios'
 
-export const SetNewAccessTokenAction = (response) => {
-  return { type: AuthActions.SET_NEW_ACCESS_TOKEN, payload: response.data }
+const refreshTokenName =
+  process.env.REACT_APP_REFRESH_TOKEN_NAME_IN_LOCAL_STORAGE
+
+export const SetNewTokensFromResponseAction = (response) => {
+  // save refresh token in local storage
+  localStorage.setItem(refreshTokenName, response.data.refreshToken)
+  // save access token in app memory (global state)
+  return {
+    type: AuthActions.SET_NEW_ACCESS_TOKEN,
+    payload: response.data.accessToken
+  }
 }
 
 export const DefineAuthStateAction = () => {
   return (dispatch) => {
-    // try to fetch auth note from local storage
-    const isAuthenticated = localStorage.getItem(AuthNoteName)
+    // fetch refresh token from localStorage
+    const refreshToken = localStorage.getItem(refreshTokenName)
 
-    if (isAuthenticated) {
-      // get new access token
+    if (refreshToken) {
+      // get new tokens
       axios({
         url: '/api/auth/refresh', // refresh token should be in cookies in that time
         method: 'post',
+        headers: { 'content-type': 'application/x-www-form-urlencoded' },
+        data: stringify({ token: refreshToken }),
         skipAuthRefresh: true // don't refresh token if we get 401 error
       })
         .then((response) => {
-          // set new acess token issued by server
-          dispatch(SetNewAccessTokenAction(response))
+          // set tokens from response
+          dispatch(SetNewTokensFromResponseAction(response))
+          // set auth state to NOT_AUTHENTICATED
+          dispatch({
+            type: AuthActions.UPDATE_AUTH_STATE,
+            payload: AuthState.AUTHENTICATED
+          })
         })
         .catch(() => {
+          // remove refresh token from localStorage
+          localStorage.removeItem(refreshTokenName)
           // set auth state to NOT_AUTHENTICATED
           dispatch({
             type: AuthActions.UPDATE_AUTH_STATE,
             payload: AuthState.NOT_AUTHENTICATED
           })
-          // remove auth note, so in the future app won't try to regain access token with that refresh token
-          localStorage.removeItem(AuthNoteName)
         })
     } else {
       dispatch({
@@ -50,22 +67,19 @@ export const LoginAction = (loginForm) => {
       skipAuthRefresh: true // don't refresh token if we get 401 error
     })
       .then((response) => {
-        // save access token in state
-        dispatch(SetNewAccessTokenAction(response))
+        // set tokens from response
+        dispatch(SetNewTokensFromResponseAction(response))
         // set AUTHENTICATED state
         dispatch({
           type: AuthActions.UPDATE_AUTH_STATE,
           payload: AuthState.AUTHENTICATED
         })
-        // set note that user authenticated
-        // it'll help to identify auth state when user lost his access token and need to regain it
-        // user losts his access token every time when closes app
-        localStorage.setItem(AuthNoteName, true)
       })
-      .catch(() => {
+      .catch((error) => {
         dispatch({
           type: AuthActions.SET_AUTH_MESSAGE,
-          payload: 'Failed to login.'
+          payload:
+            error.response.data.message || 'Failed to login! Try again later.'
         })
       })
       .finally(() => {
@@ -78,20 +92,21 @@ export const LogoutAction = (history) => {
   return (dispatch) => {
     axios({
       url: '/api/auth/logout',
-      method: 'post'
-    }).finally((response) => {
-      // remove access token on client
+      method: 'post',
+      headers: { 'content-type': 'application/x-www-form-urlencoded' },
+      data: stringify({ token: localStorage.getItem(refreshTokenName) })
+    }).finally((_) => {
+      // remove access and refresh tokens on the client side
       dispatch({
         type: AuthActions.SET_NEW_ACCESS_TOKEN,
         payload: { accessToken: '' }
       })
+      localStorage.removeItem(refreshTokenName)
       // set NOT_AUTHENTICATED state
       dispatch({
         type: AuthActions.UPDATE_AUTH_STATE,
         payload: AuthState.NOT_AUTHENTICATED
       })
-      // remove auth note so app won't be trying to refresh token on reload
-      localStorage.removeItem(AuthNoteName)
       // redirect back to the login route
       history.push('/login')
     })
@@ -111,7 +126,7 @@ export const RegisterAction = ({ registerForm, history }) => {
         // display message about successful registration
         dispatch({
           type: AuthActions.SET_AUTH_MESSAGE,
-          payload: 'Successfully registered! Now try to login.'
+          payload: response.data.message
         })
         // redirect to the login route
         history.push('/login')
@@ -119,7 +134,9 @@ export const RegisterAction = ({ registerForm, history }) => {
       .catch((error) => {
         dispatch({
           type: AuthActions.SET_AUTH_MESSAGE,
-          payload: error.message // sets some strange message
+          payload:
+            error.response.data.message ||
+            'Failed to authenticate. Try again later.'
         })
       })
       .finally(() => {

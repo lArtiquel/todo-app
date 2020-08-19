@@ -1,4 +1,5 @@
 import axios from 'axios'
+import stringify from 'qs-stringify'
 import createAuthRefreshInterceptor from 'axios-auth-refresh'
 import { AuthActions } from '../constants/auth'
 import { getAuthAccessToken } from '../store/selectors/authSelector'
@@ -6,7 +7,7 @@ import store from '../store/store'
 
 const myAxios = () => {
   const axiosOptions = {
-    baseURL: 'http://localhost:22222',
+    baseURL: process.env.REACT_APP_AXIOS_API_BASE_URL,
     method: 'get',
     headers: {
       'Content-Type': 'application/json'
@@ -18,18 +19,31 @@ const myAxios = () => {
 
   // function that will be called to refresh authorization
   const refreshAuthLogic = (failedRequest) =>
-    axiosInstance
-      .post('/api/auth/refresh', { skipAuthRefresh: true })
-      .then((tokenRefreshResponse) => {
-        // directly dispatch action to mutate the state
-        store.dispatch({
-          type: AuthActions.SET_NEW_ACCESS_TOKEN,
-          payload: tokenRefreshResponse.data
-        })
-        // eslint-disable-next-line no-param-reassign
-        failedRequest.response.config.headers.Authorization = `Bearer ${tokenRefreshResponse.data.token}`
-        return Promise.resolve()
+    axiosInstance({
+      url: '/api/auth/refresh',
+      method: 'post',
+      headers: { 'content-type': 'application/x-www-form-urlencoded' },
+      data: stringify({
+        token: localStorage.getItem(
+          process.env.REACT_APP_REFRESH_TOKEN_NAME_IN_LOCAL_STORAGE
+        )
+      }),
+      skipAuthRefresh: true
+    }).then((tokenRefreshResponse) => {
+      // save refresh token in local storage
+      localStorage.setItem(
+        process.env.REACT_APP_REFRESH_TOKEN_NAME_IN_LOCAL_STORAGE,
+        tokenRefreshResponse.data.refreshToken
+      )
+      // save access token in app memory (global state)
+      store.dispatch({
+        type: AuthActions.SET_NEW_ACCESS_TOKEN,
+        payload: tokenRefreshResponse.data.accessToken
       })
+      // eslint-disable-next-line no-param-reassign
+      failedRequest.response.config.headers.Authorization = `Bearer ${tokenRefreshResponse.data.token}`
+      return Promise.resolve()
+    })
 
   // create auth refresh token interceptor
   createAuthRefreshInterceptor(axiosInstance, refreshAuthLogic, {

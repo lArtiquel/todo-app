@@ -2,18 +2,7 @@ import React from 'react'
 import { makeStyles } from '@material-ui/core/styles'
 import PropTypes from 'prop-types'
 
-const useStyles = makeStyles((theme) => ({
-  logo: {
-    [theme.breakpoints.up('xs')]: {
-      maxWidth: 200
-    },
-    [theme.breakpoints.up('sm')]: {
-      maxWidth: 240
-    },
-    [theme.breakpoints.up('md')]: {
-      maxWidth: 500
-    }
-  },
+const useStyles = makeStyles(() => ({
   center: {
     display: 'flex',
     flexGrow: 1,
@@ -37,7 +26,6 @@ const Logo = ({ align }) => {
         xmlns="http://www.w3.org/2000/svg"
         viewBox="1.8299926757812557 29.95882720947266 496.3400146484375 90.08234558105468"
         preserveAspectRatio="xMidYMid"
-        className={styles.logo}
       >
         <defs>
           <filter

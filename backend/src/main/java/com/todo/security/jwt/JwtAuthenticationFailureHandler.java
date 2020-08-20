@@ -1,4 +1,4 @@
-package com.todo.security;
+package com.todo.security.jwt;
 
 import java.io.IOException;
 

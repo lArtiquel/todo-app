@@ -1,11 +1,14 @@
-package com.todo.security;
+package com.todo.security.jwt;
 
+import com.todo.security.EmailPasswordAuthTokenImpl;
 import com.todo.service.UserDetailsServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -35,14 +38,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private JwtValidator jwtValidator;
     private JwtProvider jwtProvider;
-    private UserDetailsServiceImpl userDetailsService;
     private JwtParser jwtParser;
 
     @Autowired
-    public JwtAuthFilter(JwtValidator jwtValidator, JwtProvider jwtProvider, UserDetailsServiceImpl userDetailsService, JwtParser jwtParser) {
+    public JwtAuthFilter(JwtValidator jwtValidator, JwtProvider jwtProvider, JwtParser jwtParser) {
         this.jwtValidator = jwtValidator;
         this.jwtProvider = jwtProvider;
-        this.userDetailsService = userDetailsService;
         this.jwtParser = jwtParser;
     }
 
@@ -61,23 +62,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         // validate jwt access token
         if (jwt != null && jwtValidator.validateAccessJwt(jwt)) {
-            // get userId from jwt token
-            final String id = jwtProvider.getUserIdFromAccessJwt(jwt);
-            // get user details
-            final UserDetails userDetails = userDetailsService.loadUserById(id);
             try {
                 // create authentication token
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails,
-                        null,
-                        userDetails.getAuthorities());
-                // set authentication details
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                // set user's authentication in Security context
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            } catch (Exception e) {
-                // in case of failure make sure it's clear; so guarantee user won't be authenticated
-                SecurityContextHolder.clearContext();
-                logger.error("Cannot set user authentication: {}", e.getMessage());
+                Authentication authenticationToken = new JwtAuthTokenImpl(jwtProvider.getUserIdFromAccessJwt(jwt),
+                        jwtProvider.getUsersGrantedAuthoritiesFromAccessJwt(jwt));
+                // set user's authentication token in Security context
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            } catch (AuthenticationException e) {
+                logger.error("Authentication exception: {}", e.getMessage());
             }
         }
 

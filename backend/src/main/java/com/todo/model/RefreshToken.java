@@ -22,7 +22,9 @@ public class RefreshToken {
     /** User id who owns the token. */
     private String userId;
 
-    /** Token expiration time */
+    /** Token expiration time.
+     * Field used to determine expired tokens in db rapidly.
+     */
     private Long expiredInSeconds;
 
     public RefreshToken(String userId, Long expiredInSeconds) {

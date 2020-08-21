@@ -11,8 +11,4 @@ public class AccessToken {
     @NonNull
     private String token;
 
-    /** When token will be expired */
-    @NonNull
-    private Long expiredInSeconds;
-
 }

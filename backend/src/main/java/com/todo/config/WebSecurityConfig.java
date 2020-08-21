@@ -1,14 +1,15 @@
 package com.todo.config;
 
-import com.todo.security.JwtAuthFailureHandler;
-import com.todo.security.JwtAuthFilter;
+import com.todo.security.AuthenticationProviderImpl;
+import com.todo.security.jwt.JwtAuthenticationFailureHandler;
+import com.todo.security.jwt.JwtAuthenticationFilter;
 import com.todo.service.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -18,11 +19,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
-
-import java.util.Arrays;
 
 /**
  * Spring Security Configuration class extends {@code WebSecurityConfigurerAdapter}
@@ -41,30 +37,33 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     /** Service used to fetch UserDetails */
     private UserDetailsServiceImpl userDetailsService;
     /** Used to commence http request properly */
-    private JwtAuthFailureHandler unauthorizedHandler;
+    private JwtAuthenticationFailureHandler unauthorizedHandler;
     /** Jwt authentication filter */
-    private JwtAuthFilter jwtAuthFilter;
+    private JwtAuthenticationFilter jwtAuthFilter;
 
     @Autowired
-    public WebSecurityConfig(UserDetailsServiceImpl userDetailsService, JwtAuthFailureHandler unauthorizedHandler, JwtAuthFilter jwtAuthFilter) {
+    public WebSecurityConfig(UserDetailsServiceImpl userDetailsService, JwtAuthenticationFailureHandler unauthorizedHandler, JwtAuthenticationFilter jwtAuthFilter) {
         this.userDetailsService = userDetailsService;
         this.unauthorizedHandler = unauthorizedHandler;
         this.jwtAuthFilter = jwtAuthFilter;
     }
 
-    /** BCrypt password encoder */
+    /** Create BCrypt password encoder bean. */
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        return new BCryptPasswordEncoder(10);
     }
 
-    /**
-     * Configure authentication manager.
-     * Make it use our user details service with BCrypt password encoder.
-     */
+    /** Create custom authentication provider bean. */
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+        return new AuthenticationProviderImpl(userDetailsService, passwordEncoder());
+    }
+
+    /** Configure authentication manager (provide custom authentication provider). */
     @Override
-    public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
-        authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+    protected void configure(AuthenticationManagerBuilder authManager) throws Exception {
+        authManager.authenticationProvider(authenticationProvider());
     }
 
     /** Create authentication manager bean. */

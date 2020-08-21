@@ -8,11 +8,11 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class JwtAuthorizationTokenImpl extends AbstractAuthenticationToken {
+public class JwtAuthenticityTokenImpl extends AbstractAuthenticationToken {
 
     private String userId;
 
-    public JwtAuthorizationTokenImpl(@NotBlank String userId, Collection<? extends GrantedAuthority> grantedAuthorities){
+    public JwtAuthenticityTokenImpl(@NotBlank String userId, Collection<GrantedAuthority> grantedAuthorities){
         super(grantedAuthorities);
         super.setAuthenticated(true);
         this.userId = userId;

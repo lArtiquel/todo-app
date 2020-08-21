@@ -16,9 +16,9 @@ import org.springframework.stereotype.Component;
  * Used to handle authentication failure properly.
  */
 @Component
-public class JwtAuthFailureHandler implements AuthenticationEntryPoint {
+public class JwtAuthenticationFailureHandler implements AuthenticationEntryPoint {
 
-	private static final Logger logger = LoggerFactory.getLogger(JwtAuthFailureHandler.class);
+	private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFailureHandler.class);
 
 	/** This method is invoked when user tries to access a secured REST resource without supplying any credentials. */
 	@Override

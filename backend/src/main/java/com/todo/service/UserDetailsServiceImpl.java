@@ -10,12 +10,16 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/** Service class used to load user details. */
+/** Service-layer class used to load user details. */
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-    @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    public UserDetailsServiceImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     /**
      * Gets user from db by id and builds user details.
@@ -24,29 +28,37 @@ public class UserDetailsServiceImpl implements UserDetailsService {
      * @throws UsernameNotFoundException
      */
     @Transactional
-    public UserDetails loadUserById(String id) throws UsernameNotFoundException {
+    public UserDetailsImpl loadUserById(String id) throws UsernameNotFoundException {
         final User user = userRepository.findById(id)
-                .orElseThrow(() -> new UsernameNotFoundException("User Not Found with such id: " + id));
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with such id: " + id));
+
+        return UserDetailsImpl.build(user);
+    }
+
+    /**
+     * Method used for fetching user by email.
+     * @param email user's name
+     * @return user details object
+     * @throws UsernameNotFoundException
+     */
+    @Transactional
+    public UserDetailsImpl loadUserByEmail(String email) throws UsernameNotFoundException {
+        final User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with such email: " + email));
 
         return UserDetailsImpl.build(user);
     }
 
     /**
      * Default {@code UserDetailsService} method to get user details.
-     * Gets user from db by username and builds user details.
-     * This is default service method of fetching user.
-     * No needed in this app, cause username field is not used here.
+     * This method is not used for fetching user in this app.
      * @param username user's name
      * @return user details object
      * @throws UsernameNotFoundException
      */
-    @Transactional
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        final User user = userRepository.findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User Not Found with such username: " + username));
-
-        return UserDetailsImpl.build(user);
+    public UserDetailsImpl loadUserByUsername(String username) throws RuntimeException {
+        throw new RuntimeException("This method is not used for fetching user in this app.");
     }
 
 }

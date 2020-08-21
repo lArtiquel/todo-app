@@ -33,7 +33,10 @@ public class UserDetailsImpl implements UserDetails {
 
     @NonNull
     @Getter @Setter
-    private Collection<? extends GrantedAuthority> authorities;
+    private Collection<GrantedAuthority> authorities;
+
+    @NonNull
+    private Boolean isEnabled;
 
     public static UserDetailsImpl build(User user) {
         Set<GrantedAuthority> authorities = user.getRoles()
@@ -45,7 +48,8 @@ public class UserDetailsImpl implements UserDetails {
                 user.getId(),
                 user.getEmail(),
                 user.getPassword(),
-                authorities);
+                authorities,
+                user.getEmailVerificationToken() != null);
     }
 
     @Override
@@ -65,7 +69,7 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return isEnabled;
     }
 
 }

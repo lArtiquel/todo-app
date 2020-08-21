@@ -1,16 +1,17 @@
 package com.todo.security;
 
-import com.todo.security.jwt.JwtAuthorizationTokenImpl;
+import com.todo.security.jwt.JwtAuthenticityTokenImpl;
 import com.todo.service.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-public class AuthenticationManagerImpl implements AuthenticationManager {
+public class AuthenticationProviderImpl implements AuthenticationProvider {
 
     private UserDetailsServiceImpl userDetailsService;
     private PasswordEncoder passwordEncoder;
@@ -38,6 +39,11 @@ public class AuthenticationManagerImpl implements AuthenticationManager {
 
         if(!userDetails.getPassword().equals(passwordEncoder.encode(password))) throw new BadCredentialsException("Wrong credentials provided!");
 
-        return new JwtAuthorizationTokenImpl(userDetails.getId(), userDetails.getAuthorities());
+        return new JwtAuthenticityTokenImpl(userDetails.getId(), userDetails.getAuthorities());
+    }
+
+    @Override
+    public boolean supports(Class<?> aClass) {
+        return aClass.equals(JwtAuthenticityTokenImpl.class);
     }
 }

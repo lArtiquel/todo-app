@@ -3,6 +3,7 @@ package com.todo.service;
 import com.todo.model.Todo;
 import com.todo.repository.TodoRepository;
 import com.todo.security.UserDetailsImpl;
+import com.todo.security.jwt.JwtAuthenticityTokenImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class TodoService {
 
     private TodoRepository todoRepository;
@@ -24,46 +26,40 @@ public class TodoService {
         this.todoRepository = todoRepository;
     }
 
-    @Transactional
-    public List<Todo> getAll() {
-        final UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext()
-                .getAuthentication().getPrincipal();
-        return todoRepository.findAllByOwnerId(userDetails.getId());
+    public String getUserIdFromAuthenticityToken() {
+        return (String)SecurityContextHolder.getContext().getAuthentication().getCredentials();
     }
 
-    @Transactional
+    public List<Todo> getAll() {
+        final String userId = getUserIdFromAuthenticityToken();
+        return todoRepository.findAllByOwnerId(userId);
+    }
+
     public Todo createTodo(String todoBody) {
-        final UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext()
-                .getAuthentication().getPrincipal();
-        final Todo todo = new Todo(userDetails.getId(), todoBody, false);
+        final String userId = getUserIdFromAuthenticityToken();
+        final Todo todo = new Todo(userId, todoBody, false);
         return todoRepository.save(todo);
     }
 
-    @Transactional
     public void toggleTodoIsDoneFlag(String todoId) {
-        final UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext()
-                .getAuthentication().getPrincipal();
-        final Todo todo = todoRepository.findByIdAndOwnerId(todoId, userDetails.getId())
+        final String userId = getUserIdFromAuthenticityToken();
+        final Todo todo = todoRepository.findByIdAndOwnerId(todoId, userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT, "User with such id does not have such todo."));
         todo.setDone(!todo.getDone());
         todoRepository.save(todo);
     }
 
-    @Transactional
     public void changeTodoBody(String todoId, String todoBody) {
-        final UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext()
-                .getAuthentication().getPrincipal();
-        final Todo todo = todoRepository.findByIdAndOwnerId(todoId, userDetails.getId())
+        final String userId = getUserIdFromAuthenticityToken();
+        final Todo todo = todoRepository.findByIdAndOwnerId(todoId, userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT, "User with such id does not have such todo."));
         todo.setBody(todoBody);
         todoRepository.save(todo);
     }
 
-    @Transactional
     public void deleteTodo(String todoId) {
-        final UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext()
-                .getAuthentication().getPrincipal();
-        final Todo todo = todoRepository.findByIdAndOwnerId(todoId, userDetails.getId())
+        final String userId = getUserIdFromAuthenticityToken();
+        final Todo todo = todoRepository.findByIdAndOwnerId(todoId, userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT, "User with such id does not have such todo."));
         todoRepository.delete(todo);
     }

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /** Service-layer class used to load user details. */
+@Transactional
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
@@ -27,7 +28,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
      * @return user details object
      * @throws UsernameNotFoundException
      */
-    @Transactional
     public UserDetailsImpl loadUserById(String id) throws UsernameNotFoundException {
         final User user = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with such id: " + id));
@@ -41,7 +41,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
      * @return user details object
      * @throws UsernameNotFoundException
      */
-    @Transactional
     public UserDetailsImpl loadUserByEmail(String email) throws UsernameNotFoundException {
         final User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with such email: " + email));

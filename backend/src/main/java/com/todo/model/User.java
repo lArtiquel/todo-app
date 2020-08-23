@@ -35,7 +35,7 @@ public class User {
     private String emailVerificationToken;
 
     /** Token used for password restoring. */
-    private String passwordRestoringToken;
+    private String passwordResetToken;
 
     public User(@NotBlank @Size(max = 40) String email, @NotBlank String password,
                 @NotBlank Set<Role> roles, @NotBlank String emailVerificationToken) {
@@ -43,7 +43,7 @@ public class User {
         this.password = password;
         this.roles = roles;
         this.emailVerificationToken = emailVerificationToken;
-        this.passwordRestoringToken = null;
+        this.passwordResetToken = null;
     }
 
     public String getId() {
@@ -86,11 +86,11 @@ public class User {
         this.emailVerificationToken = emailVerificationToken;
     }
 
-    public String getPasswordRestoringToken() {
-        return passwordRestoringToken;
+    public String getPasswordResetToken() {
+        return passwordResetToken;
     }
 
-    public void setPasswordRestoringToken(String passwordRestoringToken) {
-        this.passwordRestoringToken = passwordRestoringToken;
+    public void setPasswordResetToken(String passwordResetToken) {
+        this.passwordResetToken = passwordResetToken;
     }
 }

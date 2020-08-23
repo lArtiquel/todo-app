@@ -42,16 +42,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private JwtAuthenticationFilter jwtAuthFilter;
 
     @Autowired
-    public WebSecurityConfig(UserDetailsServiceImpl userDetailsService, JwtAuthenticationFailureHandler unauthorizedHandler, JwtAuthenticationFilter jwtAuthFilter) {
+    public WebSecurityConfig(UserDetailsServiceImpl userDetailsService, JwtAuthenticationFailureHandler unauthorizedHandler,
+                             JwtAuthenticationFilter jwtAuthFilter) {
         this.userDetailsService = userDetailsService;
         this.unauthorizedHandler = unauthorizedHandler;
         this.jwtAuthFilter = jwtAuthFilter;
+
     }
 
     /** Create BCrypt password encoder bean. */
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(10);
+        return new BCryptPasswordEncoder();
     }
 
     /** Create custom authentication provider bean. */

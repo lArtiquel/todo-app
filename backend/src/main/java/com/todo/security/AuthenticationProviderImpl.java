@@ -37,9 +37,9 @@ public class AuthenticationProviderImpl implements AuthenticationProvider {
 
         final UserDetailsImpl userDetails = userDetailsService.loadUserByEmail(email);
 
-        if(!userDetails.isEnabled()) throw new DisabledException("Verify email first! Check the mail box.");
-
         if(!userDetails.getPassword().equals(passwordEncoder.encode(password))) throw new BadCredentialsException("Wrong credentials provided!");
+
+        if(!userDetails.isEnabled()) throw new DisabledException("Verify email first! Check the mailbox.");
 
         return new JwtAuthenticityTokenImpl(userDetails.getId(), userDetails.getAuthorities());
     }

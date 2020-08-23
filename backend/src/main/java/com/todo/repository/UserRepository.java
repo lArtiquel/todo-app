@@ -11,11 +11,6 @@ public interface UserRepository extends MongoRepository<User, String> {
 
   Boolean existsByEmail(String email);
 
-  @Query("{ 'roles' : ?0 }")
-  List<User> findByRoles(String id);
-
-  Optional<User> findById(Long id);
-
-  Optional<User> findByEmail(String username);
+  Optional<User> findByEmail(String email);
 
 }

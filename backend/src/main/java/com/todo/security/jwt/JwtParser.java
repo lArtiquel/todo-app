@@ -88,4 +88,16 @@ public class JwtParser {
         return claims.getId();
     }
 
+    /**
+     * @return email encapsulated within the token as id field.
+     */
+    public String getEmailFromPasswordRestoringJwt(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(jwtConstants.getPasswordRestoringJwtSecret())
+                .parseClaimsJws(token)
+                .getBody();
+
+        return claims.getId();
+    }
+
 }

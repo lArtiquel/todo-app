@@ -1,12 +1,10 @@
-package com.todo.security;
+package com.todo.security.jwt;
 
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ResponseStatusException;
 
 /** Used to validate access and refresh tokens. */
 @Component
@@ -14,16 +12,19 @@ public class JwtValidator {
 
 	private static final Logger logger = LoggerFactory.getLogger(JwtValidator.class);
 
-	@Value("${app.config.accessJwtSecret}")
-	private String accessJwtSecret;
+	private JwtConstants jwtConstants;
 
-	@Value("${app.config.refreshJwtSecret}")
-	private String refreshJwtSecret;
+	@Autowired
+	public JwtValidator(JwtConstants jwtConstants) {
+		this.jwtConstants = jwtConstants;
+	}
 
 	/** JWT token types. */
 	private enum ETokenTypes {
 		ACCESS_TOKEN,
-		REFRESH_TOKEN
+		REFRESH_TOKEN,
+		EMAIL_VERIFICATION_TOKEN,
+		PASSWORD_RESTORING_TOKEN
 	}
 
 	/**
@@ -35,13 +36,15 @@ public class JwtValidator {
 	 */
 	private boolean validateJwt(String authToken, ETokenTypes tokenType) {
 		try {
-			// set jwt secret accordingly
-			String jwtSecret = "";
-			if(tokenType == ETokenTypes.ACCESS_TOKEN){
-				jwtSecret = accessJwtSecret;
-			} else if (tokenType == ETokenTypes.REFRESH_TOKEN) {
-				jwtSecret = refreshJwtSecret;
-			} else throw new RuntimeException("Wrong token type!");
+			// set jwt secret accordingly to the passed token type
+			final String jwtSecret;
+			switch (tokenType){
+				case ACCESS_TOKEN: jwtSecret = jwtConstants.getAccessJwtSecret(); break;
+				case REFRESH_TOKEN: jwtSecret = jwtConstants.getRefreshJwtSecret(); break;
+				case EMAIL_VERIFICATION_TOKEN: jwtSecret = jwtConstants.getEmailVerificationJwtSecret(); break;
+				case PASSWORD_RESTORING_TOKEN: jwtSecret = jwtConstants.getPasswordRestoringJwtSecret(); break;
+				default: throw new RuntimeException("Wrong token type!");
+			}
 
 			// parse jwt token
 			Jwts.parser()
@@ -67,14 +70,26 @@ public class JwtValidator {
 	}
 
 	/**
-	 * Validates jwt access token.
+	 * Validate access jwt token.
 	 */
 	public boolean validateAccessJwt(String token) {
 		return validateJwt(token, ETokenTypes.ACCESS_TOKEN);
 	}
 
 	/**
-	 * Validates refresh jwt token.
+	 * Validate refresh jwt token.
 	 */
 	public boolean validateRefreshJwt(String token) { return validateJwt(token, ETokenTypes.REFRESH_TOKEN); }
+
+	/**
+	 * Validate email verification jwt token.
+	 */
+	public boolean validateEmailVerificationJwt(String token) {
+		return validateJwt(token, ETokenTypes.EMAIL_VERIFICATION_TOKEN);
+	}
+
+	/**
+	 * Validate jwt for password restoring.
+	 */
+	public boolean validatePassRestoringJwt(String token) { return validateJwt(token, ETokenTypes.PASSWORD_RESTORING_TOKEN); }
 }

@@ -118,4 +118,19 @@ public class JwtProvider {
                 .compact();
     }
 
+    /**
+     * Generates token for password restoring.
+     * @param email as a token id.
+     * @return token for password restoring for that email.
+     */
+    public String generatePasswordRestoringToken(String email) {
+        // build email verification token
+        return Jwts.builder()
+                .setId(email)
+                .setIssuedAt(new Date())
+                .setExpiration(Date.from(Instant.now().plusSeconds(jwtConstants.getPasswordRestoringJwtExpTimeInSec())))
+                .signWith(SignatureAlgorithm.HS512, jwtConstants.getPasswordRestoringJwtSecret())
+                .compact();
+    }
+
 }

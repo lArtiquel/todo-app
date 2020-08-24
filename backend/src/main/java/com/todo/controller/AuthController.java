@@ -78,7 +78,7 @@ public class AuthController {
             @ApiResponse(
                     responseCode = "409", description = "Wrong email verification token!",
                     content = @Content)})
-    @PostMapping(value = "/verify", params = "token")
+    @PostMapping(value = "/verify-email", params = "token")
     public ResponseEntity<?> verifyEmail(@RequestParam String token) {
         authService.verifyEmail(token);
 
@@ -99,7 +99,7 @@ public class AuthController {
             @ApiResponse(
                     responseCode = "409", description = "Wrong email verification token.",
                     content = @Content)})
-    @PostMapping(value = "/cancel-verify", params = "token")
+    @PostMapping(value = "/cancel-verify-email", params = "token")
     public ResponseEntity<?> cancelAccount(@RequestParam String token) {
         authService.cancelAccount(token);
 

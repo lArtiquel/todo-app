@@ -1,5 +1,5 @@
 import stringify from 'qs-stringify'
-import { TaskActions } from '../../constants/task'
+import { TaskActions } from '../constants/task'
 import axios from '../../config/axios'
 
 export const LoadTodosAction = () => {

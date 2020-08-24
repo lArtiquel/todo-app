@@ -1,7 +1,7 @@
 import axios from 'axios'
 import stringify from 'qs-stringify'
 import createAuthRefreshInterceptor from 'axios-auth-refresh'
-import { AuthActions } from '../constants/auth'
+import { AuthActions } from '../store/constants/auth'
 import { getAuthAccessToken } from '../store/selectors/authSelector'
 import store from '../store/store'
 

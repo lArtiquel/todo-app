@@ -1,6 +1,6 @@
 import stringify from 'qs-stringify'
-import { AuthActions } from '../../constants/auth'
-import { AuthState } from '../../constants/authStates'
+import { AuthActions } from '../constants/auth'
+import { AuthState } from '../constants/authStates'
 import axios from '../../config/axios'
 
 const refreshTokenName =

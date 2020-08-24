@@ -1,5 +1,5 @@
-import { AuthActions } from '../../constants/auth'
-import { AuthState } from '../../constants/authStates'
+import { AuthActions } from '../constants/auth'
+import { AuthState } from '../constants/authStates'
 
 const initState = {
   isAuthenticated: AuthState.UNDEFINED,

@@ -33,12 +33,10 @@ import java.util.Collection;
 public class AuthController {
 
     private AuthService authService;
-    private ApplicationEventPublisher applicationEventPublisher;
 
     @Autowired
-    public AuthController(AuthService authService, ApplicationEventPublisher applicationEventPublisher) {
+    public AuthController(AuthService authService) {
         this.authService = authService;
-        this.applicationEventPublisher = applicationEventPublisher;
     }
 
     @Operation(summary = "Login user.")
@@ -80,13 +78,13 @@ public class AuthController {
             @ApiResponse(
                     responseCode = "409", description = "Wrong email verification token!",
                     content = @Content)})
-    @GetMapping(value = "/verify", params = "token")
+    @PostMapping(value = "/verify", params = "token")
     public ResponseEntity<?> verifyEmail(@RequestParam String token) {
         authService.verifyEmail(token);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new PlainMessageResponse("Email successfully verified! Now try to login."));
+                .body(new PlainMessageResponse("Email successfully verified. Now try to login!"));
     }
 
     @Operation(summary = "Cancel email verification and user account.")
@@ -101,13 +99,13 @@ public class AuthController {
             @ApiResponse(
                     responseCode = "409", description = "Wrong email verification token.",
                     content = @Content)})
-    @GetMapping(value = "/cancel-verify", params = "token")
+    @PostMapping(value = "/cancel-verify", params = "token")
     public ResponseEntity<?> cancelAccount(@RequestParam String token) {
         authService.cancelAccount(token);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new PlainMessageResponse("Account with that email successfully canceled! Thank you."));
+                .body(new PlainMessageResponse("Account for that email successfully canceled. Thank you for reporting this!"));
     }
 
     @Operation(summary = "Reset password for provided email.")
@@ -125,7 +123,7 @@ public class AuthController {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new PlainMessageResponse("Reset password mail send to provided email. Check mailbox!"));
+                .body(new PlainMessageResponse("Reset password mail send to provided email. Check the mailbox!"));
     }
 
     @Operation(summary = "Reset password.")
@@ -141,7 +139,7 @@ public class AuthController {
                     responseCode = "409", description = "New token for password restoring issued.",
                     content = @Content),
             @ApiResponse(
-                    responseCode = "409", description = "Wrong or expired token for password restoring.",
+                    responseCode = "409", description = "Wrong or expired reset password token.",
                     content = @Content)})
     @PostMapping(value = "/reset-password", params = {"token", "newPassword"})
     public ResponseEntity<?> resetPassword(@RequestParam String token, @RequestParam String newPassword) {
@@ -149,7 +147,7 @@ public class AuthController {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new PlainMessageResponse("Password successfully changed! Now try to login."));
+                .body(new PlainMessageResponse("Password successfully changed. Now try to login!"));
     }
 
     @Operation(summary = "Cancel reset password operation.")
@@ -162,9 +160,9 @@ public class AuthController {
                     responseCode = "404", description = "User with such email is not found.",
                     content = @Content),
             @ApiResponse(
-                    responseCode = "409", description = "Wrong or expired token for password restoring.",
+                    responseCode = "409", description = "Wrong or expired reset password token.",
                     content = @Content)})
-    @GetMapping(value = "/cancel-reset-password", params = "token")
+    @PostMapping(value = "/cancel-reset-password", params = "token")
     public ResponseEntity<?> cancelResetPassword(@RequestParam String token) {
         authService.cancelResetPassword(token);
 
@@ -219,7 +217,7 @@ public class AuthController {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new PlainMessageResponse("Registered successfully! Now try to login."));
+                .body(new PlainMessageResponse("Registered successfully. Verify email and try to login!"));
     }
 
     @Operation(summary = "Logout user.")

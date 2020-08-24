@@ -24,7 +24,7 @@ public class JwtValidator {
 		ACCESS_TOKEN,
 		REFRESH_TOKEN,
 		EMAIL_VERIFICATION_TOKEN,
-		PASSWORD_RESTORING_TOKEN
+		RESET_PASSWORD_TOKEN
 	}
 
 	/**
@@ -42,7 +42,7 @@ public class JwtValidator {
 				case ACCESS_TOKEN: jwtSecret = jwtConstants.getAccessJwtSecret(); break;
 				case REFRESH_TOKEN: jwtSecret = jwtConstants.getRefreshJwtSecret(); break;
 				case EMAIL_VERIFICATION_TOKEN: jwtSecret = jwtConstants.getEmailVerificationJwtSecret(); break;
-				case PASSWORD_RESTORING_TOKEN: jwtSecret = jwtConstants.getPasswordRestoringJwtSecret(); break;
+				case RESET_PASSWORD_TOKEN: jwtSecret = jwtConstants.getResetPasswordJwtSecret(); break;
 				default: throw new RuntimeException("Wrong token type!");
 			}
 
@@ -91,5 +91,5 @@ public class JwtValidator {
 	/**
 	 * Validate jwt for password restoring.
 	 */
-	public boolean validatePassRestoringJwt(String token) { return validateJwt(token, ETokenTypes.PASSWORD_RESTORING_TOKEN); }
+	public boolean validateResetPasswordJwt(String token) { return validateJwt(token, ETokenTypes.RESET_PASSWORD_TOKEN); }
 }

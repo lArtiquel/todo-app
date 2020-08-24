@@ -212,7 +212,7 @@ public class AuthService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with such email is not found."));
         // generate reset password token and save in user repo
-        String token = jwtProvider.generatePasswordRestoringToken(email);
+        String token = jwtProvider.generateResetPasswordToken(email);
         user.setPasswordResetToken(token);
         userRepository.save(user);
         // publish event which sends reset token to the provided email
@@ -221,9 +221,9 @@ public class AuthService {
 
     /** Reset password for user with that email in token. */
     public void resetPassword(String token, String newPassword) throws ResponseStatusException {
-        if(jwtValidator.validatePassRestoringJwt(token)) {
+        if(jwtValidator.validateResetPasswordJwt(token)) {
             // get user by email from token
-            User user = userRepository.findByEmail(jwtParser.getEmailFromPasswordRestoringJwt(token))
+            User user = userRepository.findByEmail(jwtParser.getEmailFromResetPasswordJwt(token))
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with such email is not found."));
             if(user.getPasswordResetToken().equals(token)) {
                 // set new password and remove reset token
@@ -232,7 +232,7 @@ public class AuthService {
                 // update user in db
                 userRepository.save(user);
             } else {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "New token for password restoring issued. Check mailbox!");
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "New password reset token issued. Check the mailbox!");
             }
         } else {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Wrong or expired token for password restoring!");
@@ -241,14 +241,18 @@ public class AuthService {
 
     /** Cancel reset token. */
     public void cancelResetPassword(String token) throws ResponseStatusException {
-        if(jwtValidator.validatePassRestoringJwt(token)) {
+        if(jwtValidator.validateResetPasswordJwt(token)) {
             // get user by email from token
-            User user = userRepository.findByEmail(jwtParser.getEmailFromPasswordRestoringJwt(token))
+            User user = userRepository.findByEmail(jwtParser.getEmailFromResetPasswordJwt(token))
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with such email is not found."));
-            // remove password reset token
-            user.setPasswordResetToken(null);
-            // update user in db
-            userRepository.save(user);
+            if(user.getPasswordResetToken().equals(token)){
+                // remove password reset token
+                user.setPasswordResetToken(null);
+                // update user in db
+                userRepository.save(user);
+            } else {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "New password reset token issued. Check the mailbox!");
+            }
         } else {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Wrong or expired token for password restoring!");
         }

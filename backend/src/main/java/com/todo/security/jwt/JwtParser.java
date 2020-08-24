@@ -3,12 +3,10 @@ package com.todo.security.jwt;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
 
@@ -91,9 +89,9 @@ public class JwtParser {
     /**
      * @return email encapsulated within the token as id field.
      */
-    public String getEmailFromPasswordRestoringJwt(String token) {
+    public String getEmailFromResetPasswordJwt(String token) {
         Claims claims = Jwts.parser()
-                .setSigningKey(jwtConstants.getPasswordRestoringJwtSecret())
+                .setSigningKey(jwtConstants.getResetPasswordJwtSecret())
                 .parseClaimsJws(token)
                 .getBody();
 

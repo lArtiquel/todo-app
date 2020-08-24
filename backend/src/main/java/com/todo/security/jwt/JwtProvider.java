@@ -29,7 +29,7 @@ public class JwtProvider {
     }
 
     /**
-     * Generates access token.
+     * Generate access token.
      * @param userId user id.
      * @param grantedAuthorities granted authorities.
      * @return Access token model.
@@ -49,7 +49,7 @@ public class JwtProvider {
     }
 
     /**
-     * Generates refresh token.
+     * Generate refresh token.
      * @param userId that asks to generate the token.
      * @return Refresh token model.
      */
@@ -105,7 +105,7 @@ public class JwtProvider {
     }
 
     /**
-     * Generates email verification token.
+     * Generate email verification token.
      * @param email as a token id.
      * @return email verification token.
      */
@@ -119,17 +119,17 @@ public class JwtProvider {
     }
 
     /**
-     * Generates token for password restoring.
+     * Generate reset password token.
      * @param email as a token id.
      * @return token for password restoring for that email.
      */
-    public String generatePasswordRestoringToken(String email) {
+    public String generateResetPasswordToken(String email) {
         // build email verification token
         return Jwts.builder()
                 .setId(email)
                 .setIssuedAt(new Date())
-                .setExpiration(Date.from(Instant.now().plusSeconds(jwtConstants.getPasswordRestoringJwtExpTimeInSec())))
-                .signWith(SignatureAlgorithm.HS512, jwtConstants.getPasswordRestoringJwtSecret())
+                .setExpiration(Date.from(Instant.now().plusSeconds(jwtConstants.getResetPasswordJwtExpTimeInSec())))
+                .signWith(SignatureAlgorithm.HS512, jwtConstants.getResetPasswordJwtSecret())
                 .compact();
     }
 

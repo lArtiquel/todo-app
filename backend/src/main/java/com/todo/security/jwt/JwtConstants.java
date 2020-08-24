@@ -32,10 +32,10 @@ public class JwtConstants {
     @Value("${app.config.jwt.emailVerification.secret}")
     private String emailVerificationJwtSecret;
 
-    @Value("${app.config.jwt.passwordRestoring.secret}")
-    private String passwordRestoringJwtSecret;
+    @Value("${app.config.jwt.resetPassword.secret}")
+    private String resetPasswordJwtSecret;
 
-    @Value("${app.config.jwt.passwordRestoring.expirationTimeInSec}")
-    private Integer passwordRestoringJwtExpTimeInSec;
+    @Value("${app.config.jwt.resetPassword.expirationTimeInSec}")
+    private Integer resetPasswordJwtExpTimeInSec;
 
 }

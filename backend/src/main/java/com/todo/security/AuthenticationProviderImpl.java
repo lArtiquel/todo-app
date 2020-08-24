@@ -9,6 +9,7 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.ProviderNotFoundException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -37,7 +38,7 @@ public class AuthenticationProviderImpl implements AuthenticationProvider {
 
         final UserDetailsImpl userDetails = userDetailsService.loadUserByEmail(email);
 
-        if(!userDetails.getPassword().equals(passwordEncoder.encode(password))) throw new BadCredentialsException("Wrong credentials provided!");
+        if(!passwordEncoder.matches(password, userDetails.getPassword())) throw new BadCredentialsException("Wrong credentials provided!");
 
         if(!userDetails.isEnabled()) throw new DisabledException("Verify email first! Check the mailbox.");
 

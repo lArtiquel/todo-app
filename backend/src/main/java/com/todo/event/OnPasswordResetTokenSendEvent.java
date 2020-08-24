@@ -10,7 +10,7 @@ public class OnPasswordResetTokenSendEvent extends ApplicationEvent {
     private String token;
 
     public OnPasswordResetTokenSendEvent(String mailAddress, String token) {
-        super(mailAddress + ": " + token);
+        super("Reset password for: " + mailAddress + " with token: " + token);
         this.mailAddress = mailAddress;
         this.token = token;
     }

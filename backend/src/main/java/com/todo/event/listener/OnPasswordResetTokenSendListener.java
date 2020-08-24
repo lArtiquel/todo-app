@@ -1,6 +1,7 @@
 package com.todo.event.listener;
 
 import com.todo.event.OnEmailVerificationRequiredEvent;
+import com.todo.event.OnPasswordResetTokenSendEvent;
 import com.todo.service.EmailServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +30,7 @@ public class OnPasswordResetTokenSendListener {
     /** Send message to email with reset password token. */
     @Async
     @EventListener
-    public void onApplicationEvent(OnEmailVerificationRequiredEvent event) {
+    public void onApplicationEvent(OnPasswordResetTokenSendEvent event) {
         String linkToResetApiMethod = frontendUrl + "/reset-password?token=";
         String linkToCancelResetApiMethod = frontendUrl + "/cancel-reset-password?token=";
         try {

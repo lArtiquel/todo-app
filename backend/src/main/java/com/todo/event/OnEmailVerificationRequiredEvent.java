@@ -10,7 +10,7 @@ public class OnEmailVerificationRequiredEvent extends ApplicationEvent {
     private String token;
 
     public OnEmailVerificationRequiredEvent(String mailAddress, String token) {
-        super(mailAddress + ": " + token);
+        super("Email verification required for: " + mailAddress + " with token: " + token);
         this.mailAddress = mailAddress;
         this.token = token;
     }

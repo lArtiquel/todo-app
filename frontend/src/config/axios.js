@@ -1,11 +1,14 @@
 import axios from 'axios'
 import stringify from 'qs-stringify'
 import createAuthRefreshInterceptor from 'axios-auth-refresh'
-import { AuthActions } from '../store/constants/auth'
-import { getAuthAccessToken } from '../store/selectors/authSelector'
+import { GetAuthAccessToken } from '../store/selectors/Auth'
+import {
+  SetNewTokensFromResponse,
+  DefineAuthState
+} from '../store/actions/Auth'
 import store from '../store/store'
 
-const myAxios = () => {
+const ConfigureAxiosInstance = () => {
   const axiosOptions = {
     baseURL: process.env.REACT_APP_AXIOS_API_BASE_URL,
     method: 'get',
@@ -29,21 +32,22 @@ const myAxios = () => {
         )
       }),
       skipAuthRefresh: true
-    }).then((tokenRefreshResponse) => {
-      // save refresh token in local storage
-      localStorage.setItem(
-        process.env.REACT_APP_REFRESH_TOKEN_NAME_IN_LOCAL_STORAGE,
-        tokenRefreshResponse.data.refreshToken
-      )
-      // save access token in app memory (global state)
-      store.dispatch({
-        type: AuthActions.SET_NEW_ACCESS_TOKEN,
-        payload: tokenRefreshResponse.data.accessToken
-      })
-      // eslint-disable-next-line no-param-reassign
-      failedRequest.response.config.headers.Authorization = `Bearer ${tokenRefreshResponse.data.token}`
-      return Promise.resolve()
     })
+      .then((tokenRefreshResponse) => {
+        // dispatch action to set new tokens from response
+        store.dispatch(SetNewTokensFromResponse())
+        // eslint-disable-next-line no-param-reassign
+        failedRequest.response.config.headers.Authorization = `Bearer ${tokenRefreshResponse.data.token}`
+        return Promise.resolve()
+      })
+      .catch(() => {
+        // remove refresh token from local storage
+        localStorage.removeItem(
+          process.env.REACT_APP_REFRESH_TOKEN_NAME_IN_LOCAL_STORAGE
+        )
+        // dispatch action to define app auth state
+        store.dispatch(DefineAuthState())
+      })
 
   // create auth refresh token interceptor
   createAuthRefreshInterceptor(axiosInstance, refreshAuthLogic, {
@@ -52,7 +56,7 @@ const myAxios = () => {
 
   // use interceptor to inject the token to requests
   axiosInstance.interceptors.request.use((request) => {
-    const accessToken = getAuthAccessToken()
+    const accessToken = GetAuthAccessToken()
     if (accessToken) request.headers.Authorization = `Bearer ${accessToken}`
     return request
   })
@@ -60,4 +64,4 @@ const myAxios = () => {
   return axiosInstance
 }
 
-export default myAxios()
+export default ConfigureAxiosInstance()

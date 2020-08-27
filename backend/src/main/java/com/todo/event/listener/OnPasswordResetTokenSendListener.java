@@ -35,7 +35,7 @@ public class OnPasswordResetTokenSendListener {
         String linkToCancelResetApiMethod = frontendUrl + "/cancel-password-reset?token=";
         try {
             emailService.sendSimpleMessage(event.getMailAddress(), "Arti's Todo App Password Reset.",
-                            "To reset password go by this link --> " + linkToResetApiMethod + event.getToken() + ".\n" +
+                            "To reset password go by this link --> " + linkToResetApiMethod + event.getToken() + ".\n\n" +
                             "If you did not do this action, please, go by this link --> " + linkToCancelResetApiMethod + event.getToken() + ".\n\n\n" +
                             "Best regards, Arti Tsv.");
         } catch (MailException e) {

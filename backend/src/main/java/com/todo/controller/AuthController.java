@@ -87,7 +87,7 @@ public class AuthController {
                 .body(new PlainMessageResponse("Email successfully verified. Now try to login!"));
     }
 
-    @Operation(summary = "Cancel email verify and remove user account.")
+    @Operation(summary = "Cancel account created with that email.")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200", description = "Account with that email canceled.",
@@ -99,7 +99,7 @@ public class AuthController {
             @ApiResponse(
                     responseCode = "409", description = "Wrong email verification token.",
                     content = @Content)})
-    @PostMapping(value = "/cancel-verify-email", params = "token")
+    @PostMapping(value = "/cancel-account", params = "token")
     public ResponseEntity<?> cancelAccount(@RequestParam String token) {
         authService.cancelAccount(token);
 

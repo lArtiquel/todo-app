@@ -100,6 +100,19 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+			<!-- Heroku deploy command: mvn heroku:deploy-only -e -->
+			<plugin>
+				<groupId>com.heroku.sdk</groupId>
+				<artifactId>heroku-maven-plugin</artifactId>
+				<version>3.0.3</version>
+				<configuration>
+					<appName>spring-mongo-jwt-todo-app</appName>
+					<processTypes>
+						<web>java $JAVA_OPTS -jar target/${project.name}-${project.version}.jar --server.port=$PORT $JAR_OPTS</web>
+					</processTypes>
+				</configuration>
+			</plugin>
+
 		</plugins>
 	</build>
 

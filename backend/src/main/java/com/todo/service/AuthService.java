@@ -240,7 +240,7 @@ public class AuthService {
     }
 
     /** Cancel reset token. */
-    public void cancelResetPassword(String token) throws ResponseStatusException {
+    public void cancelPasswordReset(String token) throws ResponseStatusException {
         if(jwtValidator.validateResetPasswordJwt(token)) {
             // get user by email from token
             User user = userRepository.findByEmail(jwtParser.getEmailFromResetPasswordJwt(token))

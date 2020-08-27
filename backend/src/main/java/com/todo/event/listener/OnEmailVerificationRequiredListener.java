@@ -32,7 +32,7 @@ public class OnEmailVerificationRequiredListener {
     @EventListener
     public void onApplicationEvent(OnEmailVerificationRequiredEvent event) {
         String linkToVerifyApiMethod = frontendUrl + "/verify-email?token=";
-        String linkToCancelVerifyApiMethod = frontendUrl + "/cancel-verify-email?token=";
+        String linkToCancelVerifyApiMethod = frontendUrl + "/cancel-email-verify?token=";
         try {
             emailService.sendSimpleMessage(event.getMailAddress(), "Arti's Todo App Email Verification.",
                     "First of all, I pleased to see you here. \n" +

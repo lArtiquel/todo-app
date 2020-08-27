@@ -87,7 +87,7 @@ public class AuthController {
                 .body(new PlainMessageResponse("Email successfully verified. Now try to login!"));
     }
 
-    @Operation(summary = "Cancel email verification and user account.")
+    @Operation(summary = "Cancel email verify and remove user account.")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200", description = "Account with that email canceled.",
@@ -105,7 +105,7 @@ public class AuthController {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new PlainMessageResponse("Account for that email successfully canceled. Thank you for reporting this!"));
+                .body(new PlainMessageResponse("Account with that email successfully canceled. Thank you!"));
     }
 
     @Operation(summary = "Reset password for provided email.")
@@ -162,9 +162,9 @@ public class AuthController {
             @ApiResponse(
                     responseCode = "409", description = "Wrong or expired reset password token.",
                     content = @Content)})
-    @PostMapping(value = "/cancel-reset-password", params = "token")
-    public ResponseEntity<?> cancelResetPassword(@RequestParam String token) {
-        authService.cancelResetPassword(token);
+    @PostMapping(value = "/cancel-password-reset", params = "token")
+    public ResponseEntity<?> cancelPasswordReset(@RequestParam String token) {
+        authService.cancelPasswordReset(token);
 
         return ResponseEntity
                 .status(HttpStatus.OK)

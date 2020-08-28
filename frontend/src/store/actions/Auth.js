@@ -23,7 +23,7 @@ export const DefineAuthState = () => {
     if (refreshToken) {
       try {
         // get new tokens
-        const response = axios({
+        const response = await axios({
           url: '/api/auth/refresh', // refresh token should be in cookies in that time
           method: 'post',
           headers: { 'content-type': 'application/x-www-form-urlencoded' },
@@ -101,7 +101,7 @@ export const Logout = ({ history }) => {
       // remove access and refresh tokens on the client side
       dispatch({
         type: AuthActionTypes.SET_NEW_ACCESS_TOKEN,
-        payload: { accessToken: '' }
+        payload: ''
       })
       localStorage.removeItem(refreshTokenName)
       // set NOT_AUTHENTICATED state
@@ -342,7 +342,8 @@ export const CloseDialog = () => {
     payload: {
       isActive: false,
       header: '',
-      message: ''
+      message: '',
+      customOnCloseAction: null
     }
   }
 }

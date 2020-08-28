@@ -5,7 +5,8 @@ const initState = {
   dialog: {
     isActive: false,
     header: '',
-    message: ''
+    message: '',
+    customOnCloseAction: null
   },
   lastDeletedTodoId: '',
   todos: []

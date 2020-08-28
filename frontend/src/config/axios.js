@@ -2,10 +2,7 @@ import axios from 'axios'
 import stringify from 'qs-stringify'
 import createAuthRefreshInterceptor from 'axios-auth-refresh'
 import { GetAuthAccessToken } from '../store/selectors/Auth'
-import {
-  SetNewTokensFromResponse,
-  DefineAuthState
-} from '../store/actions/Auth'
+import { AuthActionTypes, AuthStates } from '../store/constants/Auth'
 import store from '../store/store'
 
 const ConfigureAxiosInstance = () => {
@@ -34,19 +31,28 @@ const ConfigureAxiosInstance = () => {
       skipAuthRefresh: true
     })
       .then((tokenRefreshResponse) => {
-        // dispatch action to set new tokens from response
-        store.dispatch(SetNewTokensFromResponse())
+        // set new tokens (can't do that thru AuthActions, cause it will cause circular dependency bug)
+        store.dispatch({
+          type: AuthActionTypes.SET_NEW_ACCESS_TOKEN,
+          payload: tokenRefreshResponse.data.accessToken
+        })
+        localStorage.setItem(
+          process.env.REACT_APP_REFRESH_TOKEN_NAME_IN_LOCAL_STORAGE,
+          tokenRefreshResponse.data.refreshToken
+        )
         // eslint-disable-next-line no-param-reassign
-        failedRequest.response.config.headers.Authorization = `Bearer ${tokenRefreshResponse.data.token}`
-        return Promise.resolve()
+        failedRequest.response.config.headers.Authorization = `Bearer ${tokenRefreshResponse.data.accessToken}`
       })
       .catch(() => {
         // remove refresh token from local storage
         localStorage.removeItem(
           process.env.REACT_APP_REFRESH_TOKEN_NAME_IN_LOCAL_STORAGE
         )
-        // dispatch action to define app auth state
-        store.dispatch(DefineAuthState())
+        // change application auth state to NOT_AUTHENTICATED
+        store.dispatch({
+          type: AuthActionTypes.UPDATE_AUTH_STATE,
+          payload: AuthStates.NOT_AUTHENTICATED
+        })
       })
 
   // create auth refresh token interceptor

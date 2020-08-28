@@ -5,9 +5,9 @@ import { AppBar, Tabs as MuiTabs, Tab, Box } from '@material-ui/core'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import Todo from './Todo'
-import { getTodos } from '../store/selectors/taskSelector'
+import { GetTodos } from '../../../store/selectors/Task'
 
-function TabPanel(props) {
+function TodoTabPanel(props) {
   const { children, value, index, ...other } = props
 
   return (
@@ -23,7 +23,7 @@ function TabPanel(props) {
   )
 }
 
-TabPanel.propTypes = {
+TodoTabPanel.propTypes = {
   children: PropTypes.node,
   index: PropTypes.any.isRequired,
   value: PropTypes.any.isRequired
@@ -42,7 +42,7 @@ function a11yProps(index) {
   }
 }
 
-const Tabs = ({ my, todos }) => {
+const TodoTabs = ({ my, todos }) => {
   const classes = useStyles()
   const theme = useTheme()
   const [value, setValue] = React.useState(0)
@@ -76,7 +76,7 @@ const Tabs = ({ my, todos }) => {
         index={value}
         onChangeIndex={handleChangeIndex}
       >
-        <TabPanel value={value} index={0} dir={theme.direction}>
+        <TodoTabPanel value={value} index={0} dir={theme.direction}>
           {value === 0 &&
             todos.map((todo) => {
               return (
@@ -88,8 +88,8 @@ const Tabs = ({ my, todos }) => {
                 />
               )
             })}
-        </TabPanel>
-        <TabPanel value={value} index={1} dir={theme.direction}>
+        </TodoTabPanel>
+        <TodoTabPanel value={value} index={1} dir={theme.direction}>
           {value === 1 &&
             todos
               .filter((todo) => todo.done === false)
@@ -101,8 +101,8 @@ const Tabs = ({ my, todos }) => {
                   done={todo.done}
                 />
               ))}
-        </TabPanel>
-        <TabPanel value={value} index={2} dir={theme.direction}>
+        </TodoTabPanel>
+        <TodoTabPanel value={value} index={2} dir={theme.direction}>
           {value === 2 &&
             todos
               .filter((todo) => todo.done === true)
@@ -114,21 +114,21 @@ const Tabs = ({ my, todos }) => {
                   done={todo.done}
                 />
               ))}
-        </TabPanel>
+        </TodoTabPanel>
       </SwipeableViews>
     </Box>
   )
 }
 
-Tabs.propTypes = {
+TodoTabs.propTypes = {
   my: PropTypes.number,
   todos: PropTypes.array.isRequired
 }
 
 const mapStateToProps = () => {
   return {
-    todos: getTodos()
+    todos: GetTodos()
   }
 }
 
-export default connect(mapStateToProps, null)(Tabs)
+export default connect(mapStateToProps, null)(TodoTabs)

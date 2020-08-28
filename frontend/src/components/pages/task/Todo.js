@@ -8,10 +8,10 @@ import CloseRoundedIcon from '@material-ui/icons/CloseRounded'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import {
-  ToggleTodoDoneStateAction,
-  EditTodoAction,
-  ToggleTodoToBeDeletedStateAction
-} from '../store/actions/taskActions'
+  ToggleTodoDoneState,
+  EditTodo,
+  ToggleTodoToBeDeletedState
+} from '../../../store/actions/Task'
 
 const useStyles = makeStyles((theme) => ({
   successColor: {
@@ -150,13 +150,10 @@ Todo.propTypes = {
   toggleTodoToBeDeletedState: PropTypes.func.isRequired
 }
 
-const mapActionsToProps = (dispatch) => {
-  return {
-    toggleTodoState: (id) => dispatch(ToggleTodoDoneStateAction(id)),
-    editTodo: (id, newBody) => dispatch(EditTodoAction(id, newBody)),
-    toggleTodoToBeDeletedState: (id) =>
-      dispatch(ToggleTodoToBeDeletedStateAction(id))
-  }
+const actionCreators = {
+  toggleTodoState: ToggleTodoDoneState,
+  editTodo: EditTodo,
+  toggleTodoToBeDeletedState: ToggleTodoToBeDeletedState
 }
 
-export default connect(null, mapActionsToProps)(Todo)
+export default connect(null, actionCreators)(Todo)

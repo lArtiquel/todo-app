@@ -17,21 +17,21 @@ const useStyles = makeStyles({
         : '0 3px 5px 2px rgba(33, 203, 243, .3)',
     color: 'white',
     height: 32,
+    maxWidth: (props) => (props.maxWidth ? props.maxWidth : 'auto'),
     padding: '0 30px',
-    margin: 8
+    margin: 5
   }
 })
 
 function CoolButton(props) {
-  // destructure color prop from prop obj
-  const { color, ...other } = props
-  // Pass the props as the first argument of useStyles()
   const styles = useStyles(props)
+  const { color, maxWidth, ...other } = props
   return <Button className={styles.root} {...other} />
 }
 
 CoolButton.propTypes = {
-  color: PropTypes.oneOf(['blue', 'red']).isRequired
+  color: PropTypes.oneOf(['blue', 'red']).isRequired,
+  maxWidth: PropTypes.number
 }
 
 export default CoolButton

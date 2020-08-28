@@ -4,13 +4,13 @@ import { Button, Box } from '@material-ui/core'
 import Collapse from '@material-ui/core/Collapse'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { getDeletedTodoId } from '../store/selectors/taskSelector'
+import { GetDeletedTodoId } from '../../../store/selectors/Task'
 import {
-  ToggleTodoToBeDeletedStateAction,
-  DeleteTodoPermanentlyAction
-} from '../store/actions/taskActions'
+  ToggleTodoToBeDeletedState,
+  DeleteTodoPermanently
+} from '../../../store/actions/Task'
 
-const TransitionAlert = ({
+const TodoTransitionAlert = ({
   my,
   content,
   lastDeletedTodoId,
@@ -57,7 +57,7 @@ const TransitionAlert = ({
   )
 }
 
-TransitionAlert.propTypes = {
+TodoTransitionAlert.propTypes = {
   my: PropTypes.number,
   content: PropTypes.string.isRequired,
   lastDeletedTodoId: PropTypes.string.isRequired,
@@ -67,16 +67,13 @@ TransitionAlert.propTypes = {
 
 const mapStateToProps = () => {
   return {
-    lastDeletedTodoId: getDeletedTodoId()
+    lastDeletedTodoId: GetDeletedTodoId()
   }
 }
 
-const mapActionToProps = (dispatch) => {
-  return {
-    toggleTodoToBeDeletedState: (id) =>
-      dispatch(ToggleTodoToBeDeletedStateAction(id)),
-    deletePermanently: (id) => dispatch(DeleteTodoPermanentlyAction(id))
-  }
+const actionCreators = {
+  toggleTodoToBeDeletedState: ToggleTodoToBeDeletedState,
+  deletePermanently: DeleteTodoPermanently
 }
 
-export default connect(mapStateToProps, mapActionToProps)(TransitionAlert)
+export default connect(mapStateToProps, actionCreators)(TodoTransitionAlert)

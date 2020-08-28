@@ -2,23 +2,25 @@ import React from 'react'
 import { Box } from '@material-ui/core'
 import PropTypes from 'prop-types'
 
-const CenteredFlexContainer = ({ children }) => {
+const CenteredFlexBoxWithBorder = ({ children }) => {
   return (
     <Box
       display="flex"
+      flexDirection="column"
       justifyContent="center"
-      paddingTop={8}
-      paddingBottom={8}
+      alignItems="center"
+      height={420}
+      m={2}
     >
       <Box border={1} borderColor="text.primary" borderRadius={16}>
-        {children}
+        <Box m={2}>{children}</Box>
       </Box>
     </Box>
   )
 }
 
-CenteredFlexContainer.propTypes = {
+CenteredFlexBoxWithBorder.propTypes = {
   children: PropTypes.node
 }
 
-export default CenteredFlexContainer
+export default CenteredFlexBoxWithBorder

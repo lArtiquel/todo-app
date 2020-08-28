@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef, useCallback } from 'react'
 import { Box, Button, TextField } from '@material-ui/core'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { AddTodoAction } from '../store/actions/taskActions'
+import { AddTodo } from '../../../store/actions/Task'
 
 const TodoInput = ({ my, addTodo }) => {
   const [todo, setTodo] = useState('')
@@ -77,10 +77,8 @@ TodoInput.propTypes = {
   addTodo: PropTypes.func.isRequired
 }
 
-const mapActionToProps = (dispatch) => {
-  return {
-    addTodo: (content) => dispatch(AddTodoAction(content))
-  }
+const actionCreators = {
+  addTodo: AddTodo
 }
 
-export default connect(null, mapActionToProps)(TodoInput)
+export default connect(null, actionCreators)(TodoInput)

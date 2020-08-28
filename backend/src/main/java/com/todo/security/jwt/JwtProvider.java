@@ -12,9 +12,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Set;
+import java.util.*;
 
 @Component
 public class JwtProvider {
@@ -34,7 +32,7 @@ public class JwtProvider {
      * @param grantedAuthorities granted authorities.
      * @return Access token model.
      */
-    public AccessToken generateAccessJwt(String userId, Collection<GrantedAuthority> grantedAuthorities) {
+    public AccessToken generateAccessJwt(String userId, Collection<String> grantedAuthorities) {
         final Instant expiryDate = Instant.now().plusSeconds(jwtConstants.getAccessJwtExpirationTimeInSec());
 
         final String token = Jwts.builder()

@@ -33,11 +33,4 @@ public class JwtAuthenticityTokenImpl extends AbstractAuthenticationToken {
         return super.getAuthorities();
     }
 
-    public Set<String> getSetOfStringAuthorities() {
-        return super.getAuthorities()
-                .stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toSet());
-    }
-
 }

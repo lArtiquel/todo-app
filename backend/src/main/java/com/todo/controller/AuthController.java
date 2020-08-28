@@ -23,7 +23,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Set;
 
 /**
  * Class provides authentication endpoints.
@@ -52,9 +54,11 @@ public class AuthController {
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest) {
         // authenticate user with provided credentials and get jwt authorization token
         JwtAuthenticityTokenImpl authenticityToken = authService.authenticateUser(loginRequest);
+        // get names of user authorities
+        Collection<String> namesOfAuthorities = authService.getNamesOfAuthorities(authenticityToken.getAuthorities());
         // issue new access and refresh tokens
         AccessToken accessToken = authService.generateAccessToken(authenticityToken.getPrincipal(),
-                authenticityToken.getAuthorities());
+                namesOfAuthorities);
         RefreshToken refreshToken = authService.generateRefreshToken(authenticityToken.getPrincipal());
         // publish login event
         authService.publishLoginEvent(authenticityToken.getPrincipal());
@@ -63,7 +67,7 @@ public class AuthController {
                 .status(HttpStatus.OK)
                 .body(new LoginResponse(accessToken.getToken(),
                                 refreshToken.getToken(),
-                                authenticityToken.getSetOfStringAuthorities()));
+                        namesOfAuthorities));
     }
 
     @Operation(summary = "Verify email.")
@@ -184,18 +188,18 @@ public class AuthController {
     public ResponseEntity<?> refresh(@RequestParam String token) {
         // validate provided refresh token and fetch its model
         RefreshToken refreshTokenModel = authService.validateRefreshTokenAndFetchItsModel(token);
-        // fetch user from db for granted authorities
-        Collection<GrantedAuthority> authorities = authService.getUserAuthoritiesByUserId(refreshTokenModel.getUserId());
+        // get names of user authorities
+        Collection<String> namesOfAuthorities = authService.getNamesOfUserAuthoritiesByUserId(refreshTokenModel.getUserId());
         // generate new access token and update refresh token
         AccessToken accessTokenModel = authService.generateAccessToken(refreshTokenModel.getUserId(),
-                                                                            authorities);
+                namesOfAuthorities);
         refreshTokenModel = authService.updateRefreshToken(refreshTokenModel);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new RefreshResponse(accessTokenModel.getToken(),
                         refreshTokenModel.getToken(),
-                        authorities));
+                        namesOfAuthorities));
     }
 
     @Operation(summary = "Register user.")

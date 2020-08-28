@@ -17,6 +17,6 @@ public class RefreshResponse {
     private String refreshToken;
 
     @NonNull
-    private Collection<GrantedAuthority> roles;
+    private Collection<String> authorities;
 
 }

@@ -32,6 +32,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /** Authentication service. */
 @Service
@@ -90,8 +91,16 @@ public class AuthService {
     }
 
     /** Generate access token. */
-    public AccessToken generateAccessToken(String userId, Collection<GrantedAuthority> grantedAuthorities) {
+    public AccessToken generateAccessToken(String userId, Collection<String> grantedAuthorities) {
         return jwtProvider.generateAccessJwt(userId, grantedAuthorities);
+    }
+
+    /** Returns string set of granted authorities names. */
+    public Set<String> getNamesOfAuthorities(Collection<GrantedAuthority> grantedAuthorities) {
+        return grantedAuthorities
+                                .stream()
+                                .map(GrantedAuthority::getAuthority)
+                                .collect(Collectors.toSet());
     }
 
     /** Generate refresh token. */
@@ -170,13 +179,13 @@ public class AuthService {
         refreshTokenRepository.deleteById(refreshToken.getId());
     }
 
-    /** Get user authorities by user id. */
-    public Collection<GrantedAuthority> getUserAuthoritiesByUserId(String id) throws ResponseStatusException {
+    /** Get user authorities names by user id. */
+    public Set<String> getNamesOfUserAuthoritiesByUserId(String id) throws ResponseStatusException {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                                                                     "User with such id is not found!"));
         UserDetailsImpl userDetails = UserDetailsImpl.build(user);
-        return userDetails.getAuthorities();
+        return getNamesOfAuthorities(userDetails.getAuthorities());
     }
 
     /** Verify email with provided token. */

@@ -2,7 +2,9 @@ package com.todo.payload.response;
 
 import lombok.Data;
 import lombok.NonNull;
+import org.springframework.security.core.GrantedAuthority;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -16,6 +18,6 @@ public class LoginResponse{
     private String refreshToken;
 
     @NonNull
-    private Set<String> roles;
+    private Collection<String> authorities;
 
 }

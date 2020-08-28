@@ -4,11 +4,15 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /** Used to fetch jwt tokens from the header and cookies. */
 @Component
@@ -59,7 +63,12 @@ public class JwtParser {
                 .parseClaimsJws(token)
                 .getBody();
 
-        return claims.get(jwtConstants.getAccessJwtAuthoritiesClaimName(), Collection.class);
+        Collection<String> authorities = (Collection<String>)claims.get(jwtConstants.getAccessJwtAuthoritiesClaimName(), Collection.class);
+
+        return authorities
+                    .stream()
+                    .map(SimpleGrantedAuthority::new)
+                    .collect(Collectors.toSet());
     }
 
     /**

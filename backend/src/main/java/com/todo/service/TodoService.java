@@ -27,7 +27,7 @@ public class TodoService {
     }
 
     public String getUserIdFromAuthenticityToken() {
-        return (String)SecurityContextHolder.getContext().getAuthentication().getCredentials();
+        return (String)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
     public List<Todo> getAll() {

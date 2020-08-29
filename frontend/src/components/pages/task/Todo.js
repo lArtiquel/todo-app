@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
   },
   crossedTextDecoration: {
     textDecoration: 'line-through',
-    color: theme.palette.error.main
+    color: theme.palette.success.main
   }
 }))
 
@@ -106,13 +106,15 @@ const Todo = ({
         </>
       ) : (
         <>
-          <IconButton
-            aria-label="do"
-            className={styles.successColor}
-            onClick={() => toggleTodoState(id)}
-          >
-            <DoneRoundedIcon />
-          </IconButton>
+          <Box display="flex" flexDirection="column" justifyContent="center">
+            <IconButton
+              aria-label="do"
+              className={styles.successColor}
+              onClick={() => toggleTodoState(id)}
+            >
+              <DoneRoundedIcon />
+            </IconButton>
+          </Box>
           <Box width="100%" my={2}>
             <Typography
               className={done ? styles.crossedTextDecoration : ''}
@@ -121,20 +123,24 @@ const Todo = ({
               {body}
             </Typography>
           </Box>
-          <IconButton
-            aria-label="edit"
-            className={styles.warningColor}
-            onClick={() => setEditing(true)}
-          >
-            <EditRoundedIcon />
-          </IconButton>
-          <IconButton
-            aria-label="delete"
-            className={styles.dangerColor}
-            onClick={() => toggleTodoToBeDeletedState(id)}
-          >
-            <DeleteOutlineRoundedIcon />
-          </IconButton>
+          <Box display="flex" flexDirection="column" justifyContent="center">
+            <IconButton
+              aria-label="edit"
+              className={styles.warningColor}
+              onClick={() => setEditing(true)}
+            >
+              <EditRoundedIcon />
+            </IconButton>
+          </Box>
+          <Box display="flex" flexDirection="column" justifyContent="center">
+            <IconButton
+              aria-label="delete"
+              className={styles.dangerColor}
+              onClick={() => toggleTodoToBeDeletedState(id)}
+            >
+              <DeleteOutlineRoundedIcon />
+            </IconButton>
+          </Box>
         </>
       )}
     </Box>

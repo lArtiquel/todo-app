@@ -128,6 +128,7 @@ export const DeleteTodoPermanently = (id) => {
         url: `/api/todos/${id}`,
         method: 'delete'
       })
+      dispatch({ type: TaskActionTypes.DELETE_TODO_PERMANENTLY, payload: id })
     } catch (error) {
       dispatch({
         type: TaskActionTypes.SET_DIALOG,
